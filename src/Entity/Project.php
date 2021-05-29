@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -51,12 +52,12 @@ class Project
     private $url;
 
     /**
-     * @ORM\OneToMany(targetEntity=image::class, mappedBy="project")
+     * @ORM\OneToMany(targetEntity=Image::class, mappedBy="project")
      */
     private $images;
 
     /**
-     * @ORM\ManyToMany(targetEntity=technology::class, inversedBy="projects")
+     * @ORM\ManyToMany(targetEntity=Technology::class, inversedBy="projects")
      */
     private $technologies;
 
