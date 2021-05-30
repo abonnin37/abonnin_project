@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,7 +12,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     itemOperations={"get_user_simple"={
+ *              "method"="GET",
+ *              "path"="/users/{id}",
+ *              "normalization_context"={"groups"={"listUsersSimple"}}
+ *          }
+ *     },
+ *     collectionOperations={
+ *          "get_list_simple"={
+ *              "method"="GET",
+ *              "path"="/users",
+ *              "normalization_context"={"groups"={"listUsersSimple"}}
+ *          }
+ *     }
+ * )
  */
 class User
 {
@@ -19,21 +34,25 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"listUsersSimple"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups({"listUsersSimple"})
      */
     private $first_name;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups({"listUsersSimple"})
      */
     private $last_name;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Groups({"listUsersSimple"})
      */
     private $email;
 
@@ -44,21 +63,25 @@ class User
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"listUsersSimple"})
      */
     private $registered_at;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"listUsersSimple"})
      */
     private $last_login;
 
     /**
      * @ORM\OneToMany(targetEntity=Post::class, mappedBy="user")
+     * @ApiSubresource()
      */
     private $posts;
 
     /**
      * @ORM\OneToMany(targetEntity=Project::class, mappedBy="user")
+     * @ApiSubresource()
      */
     private $projects;
 
