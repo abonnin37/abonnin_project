@@ -10,8 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=TechnologyRepository::class)
- * @ApiResource()
  */
+#[ApiResource(
+    formats: ['jsonld'],
+)]
 class Technology
 {
     /**
