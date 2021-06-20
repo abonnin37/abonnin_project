@@ -3,13 +3,55 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\EmptyController;
 use App\Repository\ImageRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * @ORM\Entity(repositoryClass=ImageRepository::class)
- * @ApiResource()
+ * @Vich\Uploadable()
  */
+
+#[ApiResource(
+    collectionOperations: [
+        "post" => [
+            "controller" => EmptyController::class,
+            "normalization_context" => ["groups" => ["read:Image:item"]],
+            "openapi_context" => [
+                "requestBody" => [
+                    "content" => [
+                        "multipart/form-data" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "imageFile" => [
+                                        "type" => "string",
+                                        "format" => "binary"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        "get"
+    ],
+    itemOperations: [
+        "get",
+        "get_file" => [
+            "method" => "GET",
+            "path" => "/images/{id}/file",
+            "normalization_context" => ["groups" => ["read:Image:file"]],
+        ]
+    ],
+    formats: ['jsonld'],
+    normalizationContext: ["groups" => ["read:Image:item"]],
+)]
 class Image
 {
     /**
@@ -17,11 +59,13 @@ class Image
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
+    #[Groups(['read:Image:item'])]
     private $id;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
+    #[Groups(['read:Image:item'])]
     private $name;
 
     /**
@@ -35,9 +79,17 @@ class Image
     private $type;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @Vich\UploadableField(mapping="project_images", fileNameProperty="name", size="size", mimeType="type")
+     * @var File|null
      */
-    private $url;
+    #[Groups(['read:Image:file'])]
+    private $imageFile;
+
+    /**
+     * @var string|null
+     */
+    #[Groups(['read:Image:item'])]
+    public $contentUrl;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -47,6 +99,7 @@ class Image
     /**
      * @ORM\Column(type="datetime")
      */
+    #[Groups(['read:Image:item'])]
     private $registered_at;
 
     /**
@@ -54,6 +107,31 @@ class Image
      * @ORM\JoinColumn(nullable=false)
      */
     private $project;
+
+    /**
+     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
+     * of 'UploadedFile' is injected into this setter to trigger the  update. If this
+     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
+     * must be able to accept an instance of 'File' as the bundle will inject one here
+     * during Doctrine hydration.
+     *
+     * @param File|UploadedFile|null $imageFile
+     */
+    public function setImageFile(?File $imageFile = null)
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->registered_at = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
 
     public function getId(): ?int
     {
@@ -96,16 +174,20 @@ class Image
         return $this;
     }
 
-    public function getUrl(): ?string
+    /**
+     * @return string|null
+     */
+    public function getContentUrl(): ?string
     {
-        return $this->url;
+        return $this->contentUrl;
     }
 
-    public function setUrl(string $url): self
+    /**
+     * @param string|null $contentUrl
+     */
+    public function setContentUrl(?string $contentUrl): void
     {
-        $this->url = $url;
-
-        return $this;
+        $this->contentUrl = $contentUrl;
     }
 
     public function getDescription(): ?string
