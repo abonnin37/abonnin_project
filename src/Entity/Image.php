@@ -39,17 +39,16 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                 ]
             ]
         ],
-        "get"
-    ],
-    itemOperations: [
-        "get",
-        "get_file" => [
-            "method" => "GET",
-            "path" => "/images/{id}/file",
-            "normalization_context" => ["groups" => ["read:Image:file"]],
+        "get" => [
+            "normalization_context" => ["groups" => ["read:Image:item"]],
         ]
     ],
-    normalizationContext: ["groups" => ["read:Image:item"]],
+    itemOperations: [
+        "get" => [
+            "normalization_context" => ["groups" => ["read:Image:item"]],
+        ],
+        "delete"
+    ],
 )]
 class Image
 {
@@ -142,7 +141,7 @@ class Image
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -154,7 +153,7 @@ class Image
         return $this->size;
     }
 
-    public function setSize(int $size): self
+    public function setSize(?int $size): self
     {
         $this->size = $size;
 
@@ -166,7 +165,7 @@ class Image
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(?string $type): self
     {
         $this->type = $type;
 
