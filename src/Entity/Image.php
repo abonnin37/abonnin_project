@@ -49,7 +49,6 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             "normalization_context" => ["groups" => ["read:Image:file"]],
         ]
     ],
-    formats: ['jsonld'],
     normalizationContext: ["groups" => ["read:Image:item"]],
 )]
 class Image

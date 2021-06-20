@@ -11,9 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=ProjectRepository::class)
  */
-#[ApiResource(
-    formats: ['jsonld'],
-)]
+#[ApiResource()]
 class Project
 {
     /**

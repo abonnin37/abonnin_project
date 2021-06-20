@@ -21,7 +21,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
     itemOperations: [
         "get"
     ],
-    formats: ['jsonld'],
     normalizationContext: ["groups" => ["read:User:item"]],
 )]
 class User

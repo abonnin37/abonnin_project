@@ -11,9 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=PostCommentRepository::class)
  */
-#[ApiResource(
-    formats: ['jsonld'],
-)]
+#[ApiResource()]
 class PostComment
 {
     /**

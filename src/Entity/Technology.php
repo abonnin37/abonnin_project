@@ -11,9 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=TechnologyRepository::class)
  */
-#[ApiResource(
-    formats: ['jsonld'],
-)]
+#[ApiResource()]
 class Technology
 {
     /**
