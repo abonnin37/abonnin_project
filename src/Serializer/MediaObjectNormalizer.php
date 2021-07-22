@@ -4,6 +4,7 @@
 namespace App\Serializer;
 
 use App\Entity\Image;
+use App\Entity\Post;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
@@ -19,14 +20,17 @@ final class MediaObjectNormalizer implements ContextAwareNormalizerInterface, No
     {
     }
 
-    /**
-     * @param Image $object
-     */
     public function normalize($object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $context[self::ALREADY_CALLED] = true;
 
-        $object->setContentUrl($this->storage->resolveUri($object, 'imageFile'));
+        if($object instanceof Image){
+            $object->setContentUrl($this->storage->resolveUri($object, 'imageFile'));
+        }
+        if($object instanceof Post){
+            $object->setImageUrl($this->storage->resolveUri($object, 'imageFile'));
+        }
+
 
         return $this->normalizer->normalize($object, $format, $context);
     }
@@ -37,6 +41,6 @@ final class MediaObjectNormalizer implements ContextAwareNormalizerInterface, No
             return false;
         }
 
-        return $data instanceof Image;
+        return $data instanceof Image || $data instanceof Post;
     }
 }

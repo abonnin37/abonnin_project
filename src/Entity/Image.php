@@ -48,7 +48,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             "normalization_context" => ["groups" => ["read:Image:item"]],
         ],
         "delete"
-    ],
+    ]
 )]
 class Image
 {

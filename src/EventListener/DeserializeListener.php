@@ -54,7 +54,21 @@ class DeserializeListener
         }
 
         $dataRequest = $request->request->all();
+        // Get the boolean value set right
+        if ($attributes["resource_class"] === "App\Entity\Post"){
+            if ($dataRequest["published"] && $dataRequest["published"] === "true") {
+                $dataRequest["published"] = true;
+            } else {
+                $dataRequest["published"] = false;
+            }
+        }
         $files = $request->files->all();
+
+        // We test if the receive a file with a PUT method, if not, we put the old file in the $files variable
+        if ($attributes["resource_class"] === "App\Entity\Post" && $context["operation_type"] === "item" && $context["item_operation_name"] === "put" && empty($files)) {
+            $files = ["imageFile" => null]; // Trouver un moyen de récupérer le fichier déjà présent
+        }
+
         $object = $this->denormalizer->denormalize(
             array_merge($dataRequest, $files),
             $attributes['resource_class'],

@@ -77,7 +77,10 @@ class User
     /**
      * @ORM\OneToMany(targetEntity=Project::class, mappedBy="user")
      */
-    #[ApiSubresource()]
+    // https://api-platform.com/docs/core/subresources/#limiting-depth
+    #[ApiSubresource(
+        maxDepth: 1,
+    )]
     private $projects;
 
     public function __construct()
