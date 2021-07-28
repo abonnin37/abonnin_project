@@ -55,7 +55,7 @@ class Project
     /**
      * @ORM\OneToMany(targetEntity=Image::class, mappedBy="project")
      */
-    #[ApiSubresource()]
+    #[ApiSubresource]
     private $images;
 
     /**

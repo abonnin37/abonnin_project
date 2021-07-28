@@ -100,6 +100,11 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                 ]
             ]
         ]
+    ],
+    attributes: [
+        "order"=>[
+            "created_at" => "DESC"
+        ]
     ]
 )]
 class Post
