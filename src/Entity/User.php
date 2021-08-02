@@ -83,10 +83,16 @@ class User
     )]
     private $projects;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Citation::class, mappedBy="user")
+     */
+    private $citations;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
         $this->projects = new ArrayCollection();
+        $this->citations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -220,6 +226,36 @@ class User
             // set the owning side to null (unless already changed)
             if ($project->getUser() === $this) {
                 $project->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Citation[]
+     */
+    public function getCitations(): Collection
+    {
+        return $this->citations;
+    }
+
+    public function addCitation(Citation $citation): self
+    {
+        if (!$this->citations->contains($citation)) {
+            $this->citations[] = $citation;
+            $citation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCitation(Citation $citation): self
+    {
+        if ($this->citations->removeElement($citation)) {
+            // set the owning side to null (unless already changed)
+            if ($citation->getUser() === $this) {
+                $citation->setUser(null);
             }
         }
 
