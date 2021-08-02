@@ -1,0 +1,7 @@
+<h1>Message venant de alexandrebonnin.fr</h1>
+<p>De : {{ firstName }} {{ lastName }} ({{ fromEmail }})</p>
+{% if company %}
+    <p>Entreprise : {{ company }}</p>
+{% endif %}
+<p>Message :</p>
+<p>{{ message|raw }}</p>
