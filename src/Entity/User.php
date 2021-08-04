@@ -4,10 +4,13 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use App\Controller\MeController;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -16,14 +19,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     collectionOperations: [
         "get",
-        "post"
+        "post",
     ],
     itemOperations: [
-        "get"
+        "get",
+        "me" => [
+            'pagination_enabled' => false,
+            'path' => '/me',
+            'method' => 'GET',
+            'controller' => MeController::class,
+            'read' => false,
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
     ],
     normalizationContext: ["groups" => ["read:User:item"]],
 )]
-class User
+class User implements UserInterface, JWTUserInterface
 {
     /**
      * @ORM\Id
@@ -36,13 +49,11 @@ class User
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    #[Groups(['read:User:item'])]
     private $first_name;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    #[Groups(['read:User:item'])]
     private $last_name;
 
     /**
@@ -59,13 +70,11 @@ class User
     /**
      * @ORM\Column(type="datetime")
      */
-    #[Groups(['read:User:item'])]
     private $registered_at;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    #[Groups(['read:User:item'])]
     private $last_login;
 
     /**
@@ -88,6 +97,12 @@ class User
      */
     private $citations;
 
+    /**
+     * @ORM\Column(type="array")
+     */
+    #[Groups(['read:User:item'])]
+    private $roles = [];
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
@@ -98,6 +113,13 @@ class User
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getFirstName(): ?string
@@ -260,5 +282,48 @@ class User
         }
 
         return $this;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+
+        // Garantie que chaque user à le role ROLE_USER
+        $roles[] = "ROLE_USER";
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function getUsername(): string
+    {
+        return (string) $this->getEmail();
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getSalt()
+    {
+        // not needed for apps that do not check user passwords
+    }
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+
+    public static function createFromPayload($id, array $payload)
+    {
+        return (new User())->setId($id)->setEmail($payload['email'] ?? '');
     }
 }
