@@ -4,31 +4,52 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use App\Controller\ChangePasswordController;
 use App\Controller\MeController;
+use App\Controller\Signin;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity("email")
  */
 #[ApiResource(
     collectionOperations: [
         "get",
-        "post",
+        "post" => [
+            'controller' => Signin::class,
+            "normalization_context" => ["groups" => ["write:User:collection"]]
+        ],
     ],
     itemOperations: [
         "get",
+        "patch" => [
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
         "me" => [
             'pagination_enabled' => false,
             'path' => '/me',
             'method' => 'GET',
             'controller' => MeController::class,
             'read' => false,
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
+        "changePassword" => [
+            'pagination_enabled' => false,
+            'path' => '/users/{id}/changePassword',
+            'method' => 'PATCH',
+            'controller' => ChangePasswordController::class,
             'openapi_context' => [
                 'security' => [['bearerAuth' => []]]
             ],
@@ -49,22 +70,25 @@ class User implements UserInterface, JWTUserInterface
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
+    #[Groups(['read:User:item'])]
     private $first_name;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
+    #[Groups(['read:User:item'])]
     private $last_name;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
-    #[Groups(['read:User:item'])]
+    #[Groups(['read:User:item', 'write:User:collection'])]
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
+    #[Groups(['write:User:collection'])]
     private $password;
 
     /**
@@ -108,6 +132,7 @@ class User implements UserInterface, JWTUserInterface
         $this->posts = new ArrayCollection();
         $this->projects = new ArrayCollection();
         $this->citations = new ArrayCollection();
+        $this->registered_at = new \DateTime();
     }
 
     public function getId(): ?int
