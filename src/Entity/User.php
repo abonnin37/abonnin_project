@@ -15,10 +15,11 @@ use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @UniqueEntity("email")
+ * @UniqueEntity("email", message="L'email utilisé n'est pas disponible")
  */
 #[ApiResource(
     collectionOperations: [
@@ -81,6 +82,7 @@ class User implements UserInterface, JWTUserInterface
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Assert\NotBlank(message="L'email est requis")
      */
     #[Groups(['read:User:item', 'write:User:collection'])]
     private $email;
@@ -126,6 +128,11 @@ class User implements UserInterface, JWTUserInterface
      */
     #[Groups(['read:User:item'])]
     private $roles = [];
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $verified;
 
     public function __construct()
     {
@@ -350,5 +357,17 @@ class User implements UserInterface, JWTUserInterface
     public static function createFromPayload($id, array $payload)
     {
         return (new User())->setId($id)->setEmail($payload['email'] ?? '');
+    }
+
+    public function getVerified(): ?bool
+    {
+        return $this->verified;
+    }
+
+    public function setVerified(bool $verified): self
+    {
+        $this->verified = $verified;
+
+        return $this;
     }
 }
