@@ -6,6 +6,8 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Controller\ChangePasswordController;
 use App\Controller\MeController;
+use App\Controller\ResetPassword;
+use App\Controller\SendResetPasswordMail;
 use App\Controller\Signin;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,6 +29,30 @@ use Symfony\Component\Validator\Constraints as Assert;
         "post" => [
             'controller' => Signin::class,
             "normalization_context" => ["groups" => ["write:User:collection"]]
+        ],
+        "postApiResetPasswordSendEmail" => [
+            'path' => '/resetPassword',
+            'method' => 'POST',
+            'controller' => SendResetPasswordMail::class,
+            'openapi_context' => [
+                'summary' => "Envoie d'un email à l'utilisateur pour la réinitialisation du mot de passe",
+                'description' => "Prend en paramètre l'adrese email de l'utilisateur puis envoie un email si l'utilisateur à bien un comtpe en base de données.",
+                'requestBody' => [
+                    'content' => [
+                        'application/json' => [
+                            'schema' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'email' => [
+                                        'type' => 'string',
+                                        'exemple' => 'exemple@email.com',
+                                    ],
+                                ],
+                            ]
+                        ]
+                    ]
+                ],
+            ],
         ],
     ],
     itemOperations: [
@@ -53,6 +79,38 @@ use Symfony\Component\Validator\Constraints as Assert;
             'controller' => ChangePasswordController::class,
             'openapi_context' => [
                 'security' => [['bearerAuth' => []]]
+            ],
+        ],
+        "resetPassword" => [
+            'pagination_enabled' => false,
+            'path' => '/users/{id}/resetPassword',
+            'method' => 'PATCH',
+            'controller' => ResetPassword::class,
+            'openapi_context' => [
+                'summary' => "Met à jour le mot de passe de l'utilisateur",
+                'requestBody' => [
+                    'content' => [
+                        'application/json' => [
+                            'schema' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'newPassword' => [
+                                        'type' => 'string',
+                                        'exemple' => 'password',
+                                    ],
+                                    'confirmNewPassword' => [
+                                        'type' => 'string',
+                                        'exemple' => 'password',
+                                    ],
+                                    'token' => [
+                                        'type' => 'string',
+                                        'exemple' => '8T-HmXQeImSPnbLoLvxOESRUk1SnTLY-4nrLW7_UDLk',
+                                    ],
+                                ],
+                            ]
+                        ]
+                    ]
+                ],
             ],
         ],
     ],
@@ -133,6 +191,11 @@ class User implements UserInterface, JWTUserInterface
      * @ORM\Column(type="boolean")
      */
     private $verified;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $reset_token;
 
     public function __construct()
     {
@@ -367,6 +430,18 @@ class User implements UserInterface, JWTUserInterface
     public function setVerified(bool $verified): self
     {
         $this->verified = $verified;
+
+        return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->reset_token;
+    }
+
+    public function setResetToken(?string $reset_token): self
+    {
+        $this->reset_token = $reset_token;
 
         return $this;
     }
