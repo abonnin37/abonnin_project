@@ -140,15 +140,51 @@ class User implements UserInterface, JWTUserInterface
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Assert\NotBlank(message="L'email est requis")
      */
     #[Groups(['read:User:item', 'write:User:collection'])]
+    #[Assert\NotBlank(
+        message: "L'email est requis."
+    )]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "L'email doit avoir au moins  {{ limit }} caractères.",
+        maxMessage: "L'email doit avoir au plus  {{ limit }} caractères.",
+    )]
+    #[Assert\Email(
+        message: "L'email {{ value }} n'est pas un email valide.",
+    )]
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     #[Groups(['write:User:collection'])]
+    #[Assert\NotBlank(
+        message: "Le mot de passe est requis."
+    )]
+    #[Assert\Regex(
+        pattern: '/\d/',
+        message: "Le mot de passe doit contenir au moins un chiffre.",
+    )]
+    #[Assert\Regex(
+        pattern: '/[a-z]/',
+        message: "Le mot de passe doit contenir au moins une minuscule.",
+    )]
+    #[Assert\Regex(
+        pattern: '/[A-Z]/',
+        message: "Le mot de passe doit contenir au moins une majuscule.",
+    )]
+    #[Assert\Regex(
+        pattern: '/[@\!"\#\(\)\*\/\:;=\|~\[\]\?]/',
+        message: 'Le mot de passe doit contenir au moins un de ces caractère spéciaux : @!"#()*/:;=|~[]?',
+    )]
+    #[Assert\Length(
+        min: 8,
+        max: 255,
+        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractère.",
+        maxMessage: "Le mot de passe doit contenir au plus {{ limit }} caractère."
+    )]
     private $password;
 
     /**

@@ -6,6 +6,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\SendContactEmail;
 use App\Repository\ContactMailRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ContactMailRepository::class)
@@ -32,26 +33,62 @@ class ContactMail
     /**
      * @ORM\Column(type="string", length=50)
      */
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: 'Le prénom doit avoir au moins  {{ limit }} caractères.',
+        maxMessage: 'Le prénom doit avoir au plus  {{ limit }} caractères.',
+    )]
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: 'Le nom doit avoir au moins  {{ limit }} caractères.',
+        maxMessage: 'Le nom doit avoir au plus  {{ limit }} caractères.',
+    )]
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "L'email doit avoir au moins  {{ limit }} caractères.",
+        maxMessage: "L'email doit avoir au plus  {{ limit }} caractères.",
+    )]
+    #[Assert\Email(
+        message: "L'email {{ value }} n'est pas un email valide.",
+    )]
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: 'Le sujet doit avoir au moins  {{ limit }} caractères.',
+        maxMessage: 'Le sujet doit avoir au plus  {{ limit }} caractères.',
+    )]
     private $subject;
 
     /**
      * @ORM\Column(type="text")
      */
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 20,
+        minMessage: 'Le message doit avoir au moins  {{ limit }} caractères.',
+    )]
     private $message;
 
     /**

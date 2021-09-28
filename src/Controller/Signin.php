@@ -29,22 +29,26 @@ class Signin extends AbstractController
 
     public function __invoke(User $data, EntityManagerInterface $entityManager, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator)
     {
-        // We crypte the password
-        $cryptedPassword = $encoder->encodePassword($data, $data->getPassword());
-        $data->setPassword($cryptedPassword);
-        $data->setVerified(false);
-
         $errors = $validator->validate($data);
 
         if (count($errors) > 0) {
-            $message = $errors->get(0)->getMessage();
+            $errorsString = "";
+
+            for($i = 0; $i < count($errors); $i++) {
+                $errorsString .= $errors->get($i)->getMessage()."\n";
+            }
 
             return new Response(
-                json_encode(["message" => $message]),
+                json_encode(["message" => $errorsString]),
                 Response::HTTP_BAD_REQUEST,
                 ['content-type' => 'application/json'],
             );
         }
+
+        // We crypte the password
+        $cryptedPassword = $encoder->encodePassword($data, $data->getPassword());
+        $data->setPassword($cryptedPassword);
+        $data->setVerified(false);
 
         // When the $data is flushed, symfony actualise it with the new id
         $entityManager->persist($data);
