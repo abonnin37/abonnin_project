@@ -27,8 +27,19 @@ class Signin extends AbstractController
     {
     }
 
-    public function __invoke(User $data, EntityManagerInterface $entityManager, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator)
+    public function __invoke(User $data, EntityManagerInterface $entityManager, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator, Request $request)
     {
+        $requestContent = json_decode($request->getContent(), true);
+
+        // We test if the two new password are valid
+        if ($data->getPassword() !== $requestContent['confirmPassword']) {
+            return new Response(
+                json_encode(["message" => "Les deux nouveaux mots de passe ne sont pas identiques"]),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json'],
+            );
+        }
+
         $errors = $validator->validate($data);
 
         if (count($errors) > 0) {
