@@ -107,7 +107,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
         ]
     ]
 )]
-class Post implements UserOwnedInterface
+class Post
 {
     /**
      * @ORM\Id
