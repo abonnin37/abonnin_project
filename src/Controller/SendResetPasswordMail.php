@@ -46,12 +46,12 @@ class SendResetPasswordMail extends AbstractController
             }
 
             // We generate the reset url
-            $url = "http://localhost:3000/reset-password?id=".$user->getId()."&token=".$token;
+            $url = "https://alexandrebonnin.fr/reset-password?id=".$user->getId()."&token=".$token;
 
             $email = (new TemplatedEmail())
-                ->from("bonnin.a.k@gmail.com")
+                ->from($_ENV['SERVER_EMAIL'])
                 ->to($emailSent)
-                ->subject("Réinitialisation de votre mot de passe")
+                ->subject("[alexandrebonnin.fr] Réinitialisation de votre mot de passe")
                 ->htmlTemplate('emails/resetPasswordMail.html.twig')
                 ->context([
                     'link'=>$url,

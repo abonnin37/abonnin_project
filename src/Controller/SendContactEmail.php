@@ -40,9 +40,9 @@ class SendContactEmail extends AbstractController
         }
 
         $email = (new TemplatedEmail())
-            ->from($data->getEmail())
+            ->from($_ENV['SERVER_EMAIL'])
             ->to("bonnin.a.k@gmail.com")
-            ->subject($data->getSubject())
+            ->subject("[alexandrebonnin.fr] Nouveau message du formulaire de contact")
             ->htmlTemplate('emails/contactMail.html.twig')
             ->context([
                 'firstName'=>$data->getFirstName(),

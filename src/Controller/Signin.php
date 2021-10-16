@@ -74,13 +74,21 @@ class Signin extends AbstractController
         );
 
         $email = (new TemplatedEmail())
-            ->from("contact@alexandrebonnin.fr")
+            ->from($_ENV['SERVER_EMAIL'])
             ->to($data->getEmail())
             ->subject("[alexandrebonnin.fr] Lien de validation d'inscription")
             ->htmlTemplate('emails/signinMail.html.twig')
             ->context(['signedUrl' => $signatureComponents->getSignedUrl()]);
 
-        $this->mailer->send($email);
+        try {
+            $this->mailer->send($email);
+        } catch (\Exception $exception) {
+            return new Response(
+                json_encode(["message" => $exception->getMessage()]),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json'],
+            );
+        }
 
         // we send a response to the api
         return new Response(
@@ -97,21 +105,21 @@ class Signin extends AbstractController
 
         // Verify the user id exists and is not null
         if (null === $id) {
-            return $this->redirect('http://localhost:3000/login?message="L\'identifiant de l\'utilisateur n\'est pas valide"&status=400');
+            return $this->redirect('https://alexandrebonnin.fr/login?message="L\'identifiant de l\'utilisateur n\'est pas valide"&status=400');
         }
 
         $user = $userRepository->find($id);
 
         // Ensure the user exists in persistence
         if (null === $user) {
-            return $this->redirect('http://localhost:3000/login?message="L\'utilisateur n\'est pas inscrit"&status=400');
+            return $this->redirect('https://alexandrebonnin.fr/login?message="L\'utilisateur n\'est pas inscrit"&status=400');
         }
 
         // Do not get the User's Id or Email Address from the Request object
         try {
             $this->verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $user->getEmail());
         } catch (VerifyEmailExceptionInterface $e) {
-            return $this->redirect('http://localhost:3000/login?message='. $e->getReason() .'&status=400');
+            return $this->redirect('https://alexandrebonnin.fr/login?message='. $e->getReason() .'&status=400');
         }
 
         // Mark your user as verified.
@@ -120,6 +128,6 @@ class Signin extends AbstractController
         $entityManager->flush();
 
         // we redirect to the front end
-        return $this->redirect('http://localhost:3000/login?message=Votre compte à bien été créé&status=201');
+        return $this->redirect('https://alexandrebonnin.fr/login?message=Votre compte à bien été créé&status=201');
     }
 }

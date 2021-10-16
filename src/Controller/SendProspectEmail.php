@@ -34,9 +34,9 @@ class SendProspectEmail extends AbstractController
         $filePath = __DIR__."/../../public/images/curriculum/curriculum.pdf";
 
         $email = (new TemplatedEmail())
-            ->from("contact@alexandrebonnin.fr")
+            ->from($_ENV['SERVER_EMAIL'])
             ->to($data->getEmail())
-            ->subject("Document reçu de alexandrebonnin.fr")
+            ->subject("[alexandrebonnin.fr] Document reçu")
             ->htmlTemplate('emails/prospectMail.html.twig')
             ->attachFromPath($filePath);
         $this->mailer->send($email);

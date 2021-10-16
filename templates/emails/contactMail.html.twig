@@ -1,7 +1,9 @@
-<h1>Message venant de alexandrebonnin.fr</h1>
+<p>Vous avez reçu un nouveau message venant du formulaire de contact de votre site internet.</p>
 <p>De : {{ firstName }} {{ lastName }} ({{ fromEmail }})</p>
 {% if company %}
     <p>Entreprise : {{ company }}</p>
 {% endif %}
+>
+<p>Sujet : {{ subject }}</p>
 <p>Message :</p>
 <p>{{ message|raw }}</p>
