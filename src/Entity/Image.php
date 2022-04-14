@@ -19,6 +19,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[ApiResource(
     collectionOperations: [
         "post" => [
+            "security" => "is_granted('ROLE_ADMIN')",
             "controller" => EmptyController::class,
             "normalization_context" => ["groups" => ["read:Image:item"]],
             "openapi_context" => [
@@ -47,7 +48,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
         "get" => [
             "normalization_context" => ["groups" => ["read:Image:item"]],
         ],
-        "delete"
+        "delete" => ["security" => "is_granted('ROLE_ADMIN')"],
     ],
     subresourceOperations: [
         'api_projects_images_get_subresource' => [

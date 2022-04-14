@@ -20,6 +20,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[ApiResource(
     collectionOperations: [
         "post" => [
+            "security" => "is_granted('ROLE_ADMIN')",
             "controller" => EmptyController::class,
             "normalization_context" => ["groups" => ["read:Post:item"]],
             "openapi_context" => [
@@ -60,11 +61,12 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
         ],
     ],
     itemOperations: [
-        "delete",
+        "delete" => ["security" => "is_granted('ROLE_ADMIN')"],
         "get" => [
             "normalization_context" => ["groups" => ["read:Post:item"]],
         ],
         "put" => [
+            "security" => "is_granted('ROLE_ADMIN')",
             "controller" => EmptyController::class,
             "normalization_context" => ["groups" => ["read:Post:item"]],
             "openapi_context" => [

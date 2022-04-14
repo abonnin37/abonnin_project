@@ -11,7 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=CategoryRepository::class)
  */
-#[ApiResource()]
 class Category
 {
     /**

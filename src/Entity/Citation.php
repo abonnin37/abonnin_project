@@ -9,7 +9,18 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=CitationRepository::class)
  */
-#[ApiResource()]
+#[ApiResource(
+    collectionOperations: [
+        "get",
+        "post" => ["security" => "is_granted('ROLE_ADMIN')"]
+    ],
+    itemOperations: [
+        "get",
+        "put" => ["security" => "is_granted('ROLE_ADMIN')"],
+        "patch" => ["security" => "is_granted('ROLE_ADMIN')"],
+        "delete" => ["security" => "is_granted('ROLE_ADMIN')"]
+    ]
+)]
 class Citation
 {
     /**

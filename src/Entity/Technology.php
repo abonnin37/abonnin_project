@@ -7,11 +7,29 @@ use App\Repository\TechnologyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=TechnologyRepository::class)
  */
-#[ApiResource()]
+#[ApiResource(
+    collectionOperations: [
+        "get",
+        "post" => ["security" => "is_granted('ROLE_ADMIN')"]
+    ],
+    itemOperations: [
+        "get",
+        "put" => ["security" => "is_granted('ROLE_ADMIN')"],
+        "patch" => ["security" => "is_granted('ROLE_ADMIN')"],
+        "delete" => ["security" => "is_granted('ROLE_ADMIN')"]
+    ],
+    subresourceOperations: [
+        'api_projects_technologies_get_subresource' => [
+            'method' => 'GET',
+            "normalization_context" => ["groups" => ["read:Technologies:item"]],
+        ],
+    ],
+)]
 class Technology
 {
     /**
@@ -19,11 +37,13 @@ class Technology
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
+    #[Groups(['read:Technologies:item'])]
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
+    #[Groups(['read:Technologies:item'])]
     private $name;
 
     /**

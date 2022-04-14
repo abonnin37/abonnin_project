@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ApiResource(
     collectionOperations: [
-        "get",
+        "get" => ["security" => "is_granted('ROLE_ADMIN')"],
         "post" => [
             'controller' => Signin::class,
             "normalization_context" => ["groups" => ["write:User:collection"]]
@@ -58,11 +58,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     itemOperations: [
         "get",
         "patch" => [
+            "security" => "is_granted('ROLE_USER')",
             'openapi_context' => [
                 'security' => [['bearerAuth' => []]]
             ],
         ],
         "me" => [
+            "security" => "is_granted('ROLE_USER')",
             'pagination_enabled' => false,
             'path' => '/me',
             'method' => 'GET',
@@ -73,6 +75,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             ],
         ],
         "changePassword" => [
+            "security" => "is_granted('ROLE_USER')",
             'pagination_enabled' => false,
             'path' => '/users/{id}/changePassword',
             'method' => 'PATCH',
