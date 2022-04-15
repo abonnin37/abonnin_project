@@ -23,7 +23,7 @@ class LoginSubscriber implements EventSubscriberInterface
         // We verify if the user is activated
         // see for more detail : https://symfony.com/doc/current/security/guard_authentication.html#customizing-error-messages
         if (!$user->getVerified()) {
-            throw new CustomUserMessageAuthenticationException("Votre compte n'est pas activé");
+            throw new CustomUserMessageAuthenticationException("deactivated_account");
         }
 
         // We update the last login date
