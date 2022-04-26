@@ -23,6 +23,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             "controller" => EmptyController::class,
             "normalization_context" => ["groups" => ["read:Image:item"]],
             "openapi_context" => [
+                'security' => [['bearerAuth' => []]],
                 "requestBody" => [
                     "content" => [
                         "multipart/form-data" => [
@@ -48,7 +49,12 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
         "get" => [
             "normalization_context" => ["groups" => ["read:Image:item"]],
         ],
-        "delete" => ["security" => "is_granted('ROLE_ADMIN')"],
+        "delete" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
     ],
     subresourceOperations: [
         'api_projects_images_get_subresource' => [

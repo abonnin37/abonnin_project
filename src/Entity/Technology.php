@@ -15,13 +15,33 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     collectionOperations: [
         "get",
-        "post" => ["security" => "is_granted('ROLE_ADMIN')"]
+        "post" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
     ],
     itemOperations: [
         "get",
-        "put" => ["security" => "is_granted('ROLE_ADMIN')"],
-        "patch" => ["security" => "is_granted('ROLE_ADMIN')"],
-        "delete" => ["security" => "is_granted('ROLE_ADMIN')"]
+        "put" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
+        "patch" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
+        "delete" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
     ],
     subresourceOperations: [
         'api_projects_technologies_get_subresource' => [

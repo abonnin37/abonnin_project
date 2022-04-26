@@ -25,7 +25,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ApiResource(
     collectionOperations: [
-        "get" => ["security" => "is_granted('ROLE_ADMIN')"],
+        "get" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
         "post" => [
             'controller' => Signin::class,
             "normalization_context" => ["groups" => ["write:User:collection"]]
@@ -458,7 +463,8 @@ class User implements UserInterface, JWTUserInterface
 
     public static function createFromPayload($id, array $payload)
     {
-        return (new User())->setId($id)->setEmail($payload['email'] ?? '');
+        // Penser à hydrater les rôle de l'utilisateur, sinon pas de getion des droits possible !
+        return (new User())->setId($id)->setEmail($payload['email'] ?? '')->setRoles($payload["roles"]);
     }
 
     public function getVerified(): ?bool

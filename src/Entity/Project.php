@@ -15,13 +15,33 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     collectionOperations: [
         "get",
-        "post" => ["security" => "is_granted('ROLE_ADMIN')"]
+        "post" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
     ],
     itemOperations: [
         "get",
-        "put" => ["security" => "is_granted('ROLE_ADMIN')"],
-        "patch" => ["security" => "is_granted('ROLE_ADMIN')"],
-        "delete" => ["security" => "is_granted('ROLE_ADMIN')"]
+        "put" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
+        "patch" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
+        "delete" => [
+            "security" => "is_granted('ROLE_ADMIN')",
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ],
+        ],
     ]
 )]
 class Project
