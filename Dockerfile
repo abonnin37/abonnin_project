@@ -1,4 +1,4 @@
-FROM php:8.0-fpm
+FROM php:8.0-fpm-alpine
 
 # Installation des dépendances système nécessaires
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,12 +21,14 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
 # Définition du répertoire de travail
 WORKDIR /var/www
 
+RUN chown -R www-data:www-data /var/www
+USER www-data
+
 # Copier uniquement composer.json et composer.lock pour optimiser le cache Docker
 COPY . .
 
 # Installer Composer 1.x pour cause de compatibilité avec Symfony Flex
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN composer self-update --1
 
 # Installer les dépendances PHP de Symfony
 RUN composer install --no-dev --optimize-autoloader
