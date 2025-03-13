@@ -15,8 +15,6 @@ services:
     networks:
       - traefik_default
       - internal_network
-    depends_on:
-      - db
 
   backend-alexandrebonnin-fr-nginx:
     image: nginx:1.21

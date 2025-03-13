@@ -1,18 +1,17 @@
 FROM php:8.0-fpm-alpine
 
 # Installation des dépendances système nécessaires
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
-    libzip-dev \
+RUN apk add --no-cache \
     zip \
     unzip \
     git \
     nano \
-    pkg-config \
+    pkgconfig \
+    libzip-dev \
+    mariadb-client \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install pdo pdo_mysql opcache zip \
-    && docker-php-ext-enable opcache \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && docker-php-ext-install pdo pdo_mysql zip \
+    && docker-php-ext-enable opcache
 
 # Installer Symfony CLI
 RUN curl -sS https://get.symfony.com/cli/installer | bash \
