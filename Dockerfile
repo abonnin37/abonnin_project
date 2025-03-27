@@ -1,7 +1,8 @@
-FROM php:8.0-apache-alpine
+FROM php:8.0-alpine
 
 # Installation des dépendances système nécessaires
 RUN apk add --no-cache \
+    apache2 \
     bash \
     zip \
     unzip \
@@ -38,6 +39,6 @@ USER www-data
 RUN composer install --no-dev --optimize-autoloader
 
 # Apache: activer mod_rewrite pour Symfony
-RUN a2enmod rewrite
+RUN apk add --no-cache apache2-mod-rewrite
 
-CMD ["apache2-foreground"]
+CMD ["httpd", "-D", "FOREGROUND"]
