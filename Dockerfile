@@ -16,6 +16,10 @@ RUN apk add --no-cache \
     && docker-php-ext-install pdo pdo_mysql zip \
     && docker-php-ext-enable opcache
 
+# Activer mod_rewrite pour Apache
+RUN sed -i '/#LoadModule rewrite_module/s/^#//g' /etc/apache2/httpd.conf \
+    && echo "ServerName localhost" >> /etc/apache2/httpd.conf
+
 # Installer Symfony CLI
 RUN curl -sS https://get.symfony.com/cli/installer | bash \
     && mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
@@ -24,21 +28,17 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
 WORKDIR /var/www/html
 
 RUN chown -R www-data:www-data /var/www/html
-USER www-data
 
 # Copier uniquement composer.json et composer.lock pour optimiser le cache Docker
 COPY . .
 
 # Installer Composer 1.x pour cause de compatibilité avec Symfony Flex
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-USER root
 RUN composer self-update --1
+
 USER www-data
 
 # Installer les dépendances PHP de Symfony
 RUN composer install --no-dev --optimize-autoloader
-
-# Apache: activer mod_rewrite pour Symfony
-RUN apk add --no-cache apache2-mod-rewrite
 
 CMD ["httpd", "-D", "FOREGROUND"]
