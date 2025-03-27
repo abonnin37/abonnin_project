@@ -16,7 +16,7 @@ RUN apk add --no-cache \
     && docker-php-ext-enable opcache
 
 # Installer Symfony CLI
-RUN curl -sS https://get.symfony.com/cli/installer | sh \
+RUN curl -sS https://get.symfony.com/cli/installer | bash \
     && mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
 
 # Définition du répertoire de travail
