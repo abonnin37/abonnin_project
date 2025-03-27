@@ -30,6 +30,9 @@ COPY . .
 
 # Installer Composer 1.x pour cause de compatibilité avec Symfony Flex
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+USER root
+RUN composer self-update --1
+USER www-data
 
 # Installer les dépendances PHP de Symfony
 RUN composer install --no-dev --optimize-autoloader
