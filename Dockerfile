@@ -2,6 +2,7 @@ FROM php:8.0-fpm-alpine
 
 # Installation des dépendances système nécessaires
 RUN apk add --no-cache \
+    bash \
     zip \
     unzip \
     git \
@@ -9,12 +10,13 @@ RUN apk add --no-cache \
     pkgconfig \
     libzip-dev \
     mariadb-client \
+    curl \
     && docker-php-ext-configure zip \
     && docker-php-ext-install pdo pdo_mysql zip \
     && docker-php-ext-enable opcache
 
 # Installer Symfony CLI
-RUN curl -sS https://get.symfony.com/cli/installer | bash \
+RUN curl -sS https://get.symfony.com/cli/installer | sh \
     && mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
 
 # Définition du répertoire de travail
