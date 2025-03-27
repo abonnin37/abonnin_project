@@ -1,4 +1,4 @@
-FROM php:8.0-fpm-alpine
+FROM php:8.0-apache-alpine
 
 # Installation des dépendances système nécessaires
 RUN apk add --no-cache \
@@ -20,9 +20,9 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
     && mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
 
 # Définition du répertoire de travail
-WORKDIR /var/www
+WORKDIR /var/www/html
 
-RUN chown -R www-data:www-data /var/www
+RUN chown -R www-data:www-data /var/www/html
 USER www-data
 
 # Copier uniquement composer.json et composer.lock pour optimiser le cache Docker
@@ -37,4 +37,7 @@ USER www-data
 # Installer les dépendances PHP de Symfony
 RUN composer install --no-dev --optimize-autoloader
 
-CMD ["php-fpm"]
+# Apache: activer mod_rewrite pour Symfony
+RUN a2enmod rewrite
+
+CMD ["apache2-foreground"]
