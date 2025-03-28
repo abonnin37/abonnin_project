@@ -2,7 +2,7 @@
 
 namespace App\EventListener;
 
-use ApiPlatform\EventListener\DeserializeListener as DecoratedListener;
+use ApiPlatform\Symfony\EventListener\DeserializeListener as DecoratedListener;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;

@@ -5,6 +5,9 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - .:/var/www/html
+      - .env.dev:/var/www/html/.env
+      - /var/www/html/vendor
+      - /var/www/html/var
     environment:
       - APP_ENV=dev
       - DATABASE_URL=${DATABASE_URL}
@@ -19,6 +22,9 @@ services:
       - "8080:80"
     volumes:
       - .:/var/www/html
+      - .env.dev:/var/www/html/.env
+      - /var/www/html/vendor
+      - /var/www/html/var
       - ./nginx/dev.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
