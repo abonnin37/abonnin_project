@@ -3,9 +3,5 @@ framework:
         enabled: true
         email_validation_mode: html5
         auto_mapping:
-            App\Entity\:
-                namespaces:
-                    - App\Entity
-        strict_mode: true
+            App\Entity: []
         cache: validator.mapping.cache
-        api: true

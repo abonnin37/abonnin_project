@@ -8,17 +8,5 @@ doctrine_migrations:
             version_column_name: 'version'
             version_column_length: 1024
             executed_at_column_name: 'executed_at'
-    services:
-        'Doctrine\Bundle\MigrationsBundle\MigrationsConfiguration\Configuration': '@doctrine.migrations.configuration.default'
-    migrations_configuration:
-        default:
-            name: 'Alexandre Bonnin Migrations'
-            namespace: 'DoctrineMigrations'
-            table_name: 'doctrine_migration_versions'
-            column_name: 'version'
-            column_length: 1024
-            executed_at_column_name: 'executed_at'
-            migrations_directory: '%kernel.project_dir%/migrations'
-            migrations_namespace: 'DoctrineMigrations'
-            all_or_nothing: true
-            check_database_platform: true
+    all_or_nothing: true
+    check_database_platform: true

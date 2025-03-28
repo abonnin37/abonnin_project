@@ -40,6 +40,8 @@ services:
         tags:
             - {name: 'kernel.event_listener', event: 'kernel.request', method: 'onKernelRequest', priority: 2}
         decorates: 'api_platform.listener.request.deserialize'
+        arguments:
+            $decorated: '@.inner'
         autoconfigure: false
 
     # add more service definitions when explicit configuration is needed

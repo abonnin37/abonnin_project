@@ -13,14 +13,3 @@ knpu_oauth2_client:
             redirect_route: connect_github_check
             redirect_params: {}
     http_client: ~
-    cache: cache.app
-    cache_key: 'oauth2_client'
-    cache_lifetime: 3600
-    cache_headers: true
-    cache_headers_ttl: 3600
-    cache_headers_private: true
-    cache_headers_no_cache: false
-    cache_headers_must_revalidate: true
-    cache_headers_proxy_revalidate: false
-    cache_headers_max_age: 3600
-    cache_headers_s_maxage: 3600

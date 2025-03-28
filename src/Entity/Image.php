@@ -53,12 +53,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             openapiContext: ['security' => [['bearerAuth' => []]]]
         )
     ],
-    subresourceOperations: [
-        'api_projects_images_get_subresource' => [
-            'method' => 'GET',
-            "normalization_context" => ["groups" => ["read:Image:item"]],
-        ],
-    ]
+    order: ['registered_at' => 'DESC']
 )]
 class Image
 {

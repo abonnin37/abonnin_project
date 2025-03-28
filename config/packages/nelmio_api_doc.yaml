@@ -21,15 +21,5 @@ nelmio_api_doc:
     areas:
         path_patterns:
             - ^/api/(?!doc$)
-    sandbox:
-        enabled: true
-        accept_type: application/json
-        body_format: form
-        request_format:
-            method: content_type
-        custom_headers:
-            Accept: application/json
-            Content-Type: application/json
     cache:
-        enabled: true
         pool: cache.app

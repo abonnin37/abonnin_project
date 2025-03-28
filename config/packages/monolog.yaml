@@ -1,5 +1,5 @@
 monolog:
-    channels: ['app', 'security', 'api']
+    channels: ['app', 'security', 'api', 'deprecation']
     handlers:
         main:
             type: stream

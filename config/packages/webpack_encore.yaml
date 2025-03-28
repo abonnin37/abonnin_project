@@ -3,19 +3,6 @@ webpack_encore:
     script_attributes:
         defer: true
     preload: true
-    preload_attributes:
-        as: 'style'
-    integrity: '%kernel.debug%'
-    strict_mode: true
     cache: true
-    cache_version: '%kernel.environment%'
-    cache_version_attributes: true
-    cache_version_strategy: manifest
-    cache_version_manifest_path: '%kernel.project_dir%/public/build/manifest.json'
-    cache_version_manifest_script: true
-    cache_version_manifest_script_attributes:
-        defer: true
-    cache_version_manifest_script_integrity: '%kernel.debug%'
-    cache_version_manifest_script_preload: true
-    cache_version_manifest_script_preload_attributes:
-        as: 'script'
+    crossorigin: 'anonymous'
+    strict_mode: true

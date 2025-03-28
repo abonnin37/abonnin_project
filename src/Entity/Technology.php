@@ -36,12 +36,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: "is_granted('ROLE_ADMIN')",
             openapiContext: ['security' => [['bearerAuth' => []]]]
         )
-    ],
-    subresourceOperations: [
-        'api_projects_technologies_get_subresource' => [
-            'method' => 'GET',
-            "normalization_context" => ["groups" => ["read:Technologies:item"]],
-        ],
     ]
 )]
 class Technology

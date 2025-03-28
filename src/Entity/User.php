@@ -458,7 +458,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 
     public static function createFromPayload($id, array $payload)

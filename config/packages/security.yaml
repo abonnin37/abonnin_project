@@ -20,11 +20,11 @@ security:
         refresh:
             pattern: ^/api/token/refresh
             stateless: true
-            anonymous: true
+            security: false
         login:
             pattern: ^/api/login$
             stateless: true
-            anonymous: true
+            security: false
             provider: in_database
             json_login:
                 check_path: /api/login
@@ -35,7 +35,7 @@ security:
             provider: jwt
             pattern: ^/api
             stateless: true
-            anonymous: true
+            security: false
             jwt: ~
             refresh_jwt:
                 check_path: /api/token/refresh
