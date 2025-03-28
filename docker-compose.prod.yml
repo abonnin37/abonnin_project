@@ -1,5 +1,6 @@
 services:
-  app:
+  backend-alexandrebonnin-fr:
+    container_name: backend-alexandrebonnin-fr
     build:
       context: .
       dockerfile: Dockerfile.prod
