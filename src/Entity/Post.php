@@ -2,7 +2,12 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use App\Controller\EmptyController;
 use App\Repository\PostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,17 +18,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-/**
- * @ORM\Entity(repositoryClass=PostRepository::class)
- * @Vich\Uploadable()
- */
+#[ORM\Entity(repositoryClass: PostRepository::class)]
+#[Vich\Uploadable]
 #[ApiResource(
-    collectionOperations: [
-        "post" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            "controller" => EmptyController::class,
-            "normalization_context" => ["groups" => ["read:Post:item"]],
-            "openapi_context" => [
+    operations: [
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            controller: EmptyController::class,
+            normalizationContext: ["groups" => ["read:Post:item"]],
+            openapiContext: [
                 'security' => [['bearerAuth' => []]],
                 "requestBody" => [
                     "content" => [
@@ -56,26 +59,22 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                     ]
                 ]
             ]
-        ],
-        "get" => [
-            "normalization_context" => ["groups" => ["read:Post:item"]],
-        ],
-    ],
-    itemOperations: [
-        "delete" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "get" => [
-            "normalization_context" => ["groups" => ["read:Post:item"]],
-        ],
-        "put" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            "controller" => EmptyController::class,
-            "normalization_context" => ["groups" => ["read:Post:item"]],
-            "openapi_context" => [
+        ),
+        new GetCollection(
+            normalizationContext: ["groups" => ["read:Post:item"]]
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Get(
+            normalizationContext: ["groups" => ["read:Post:item"]]
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            controller: EmptyController::class,
+            normalizationContext: ["groups" => ["read:Post:item"]],
+            openapiContext: [
                 'security' => [['bearerAuth' => []]],
                 "requestBody" => [
                     "content" => [
@@ -108,105 +107,68 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                     ]
                 ]
             ]
-        ]
+        )
     ],
-    attributes: [
-        "order"=>[
-            "created_at" => "DESC"
-        ]
-    ]
+    order: ['created_at' => 'DESC']
 )]
 class Post
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     #[Groups(['read:Post:item'])]
-    private $id;
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="posts")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:Post:item'])]
-    private $user;
+    private ?User $user = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['read:Post:item'])]
-    private $title;
+    private ?string $title = null;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     #[Groups(['read:Post:item'])]
-    private $summary;
+    private ?string $summary = null;
 
-    /**
-     * @Vich\UploadableField(mapping="post_images", fileNameProperty="imageName")
-     * @var File|null
-     */
-    private $imageFile;
+    #[Vich\UploadableField(mapping: 'post_images', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $imageName;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $imageName = null;
 
-
-    /**
-     * @var string|null
-     */
     #[Groups(['read:Post:item'])]
-    public $imageUrl;
+    public ?string $imageUrl = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['read:Post:item'])]
-    private $content;
+    private ?string $content = null;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     #[Groups(['read:Post:item'])]
-    private $published;
+    private bool $published = false;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     #[Groups(['read:Post:item'])]
-    private $created_at;
+    private ?\DateTimeInterface $created_at = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     #[Groups(['read:Post:item'])]
-    private $updated_at;
+    private ?\DateTimeInterface $updated_at = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:Post:item'])]
-    private $published_at;
+    private ?\DateTimeInterface $published_at = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=PostComment::class, mappedBy="post")
-     */
-    private $postComments;
+    #[ORM\OneToMany(targetEntity: PostComment::class, mappedBy: 'post')]
+    private Collection $postComments;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Category::class, mappedBy="posts")
-     */
-    private $categories;
+    #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'posts')]
+    private Collection $categories;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Tag::class, mappedBy="posts")
-     */
-    private $tags;
+    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'posts')]
+    private Collection $tags;
 
     public function __construct()
     {
@@ -229,7 +191,6 @@ class Post
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -241,7 +202,6 @@ class Post
     public function setTitle(string $title): self
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -253,26 +213,14 @@ class Post
     public function setSummary(string $summary): self
     {
         $this->summary = $summary;
-
         return $this;
     }
 
-    /**
-     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
-     * of 'UploadedFile' is injected into this setter to trigger the  update. If this
-     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
-     * must be able to accept an instance of 'File' as the bundle will inject one here
-     * during Doctrine hydration.
-     *
-     * @param File|UploadedFile|null $imageFile
-     */
-    public function setImageFile(?File $imageFile = null)
+    public function setImageFile(?File $imageFile = null): void
     {
         $this->imageFile = $imageFile;
 
         if (null !== $imageFile) {
-            // It is required that at least one field changes if you are using doctrine
-            // otherwise the event listeners won't be called and the file is lost
             $this->updated_at = new \DateTimeImmutable();
         }
     }
@@ -282,17 +230,11 @@ class Post
         return $this->imageFile;
     }
 
-    /**
-     * @return string|null
-     */
     public function getImageUrl(): ?string
     {
         return $this->imageUrl;
     }
 
-    /**
-     * @param string|null $contentUrl
-     */
     public function setImageUrl(?string $contentUrl): void
     {
         $this->imageUrl = $contentUrl;
@@ -306,7 +248,6 @@ class Post
     public function setContent(?string $content): self
     {
         $this->content = $content;
-
         return $this;
     }
 
@@ -318,7 +259,6 @@ class Post
     public function setPublished(bool $published): self
     {
         $this->published = $published;
-
         return $this;
     }
 
@@ -330,7 +270,6 @@ class Post
     public function setCreatedAt(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 
@@ -342,7 +281,6 @@ class Post
     public function setUpdatedAt(\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
-
         return $this;
     }
 
@@ -354,12 +292,11 @@ class Post
     public function setPublishedAt(?\DateTimeInterface $published_at): self
     {
         $this->published_at = $published_at;
-
         return $this;
     }
 
     /**
-     * @return Collection|PostComment[]
+     * @return Collection<int, PostComment>
      */
     public function getPostComments(): Collection
     {
@@ -372,24 +309,21 @@ class Post
             $this->postComments[] = $postComment;
             $postComment->setPost($this);
         }
-
         return $this;
     }
 
     public function removePostComment(PostComment $postComment): self
     {
         if ($this->postComments->removeElement($postComment)) {
-            // set the owning side to null (unless already changed)
             if ($postComment->getPost() === $this) {
                 $postComment->setPost(null);
             }
         }
-
         return $this;
     }
 
     /**
-     * @return Collection|Category[]
+     * @return Collection<int, Category>
      */
     public function getCategories(): Collection
     {
@@ -402,7 +336,6 @@ class Post
             $this->categories[] = $category;
             $category->addPost($this);
         }
-
         return $this;
     }
 
@@ -411,12 +344,11 @@ class Post
         if ($this->categories->removeElement($category)) {
             $category->removePost($this);
         }
-
         return $this;
     }
 
     /**
-     * @return Collection|Tag[]
+     * @return Collection<int, Tag>
      */
     public function getTags(): Collection
     {
@@ -429,7 +361,6 @@ class Post
             $this->tags[] = $tag;
             $tag->addPost($this);
         }
-
         return $this;
     }
 
@@ -438,7 +369,6 @@ class Post
         if ($this->tags->removeElement($tag)) {
             $tag->removePost($this);
         }
-
         return $this;
     }
 
@@ -450,7 +380,6 @@ class Post
     public function setImageName(?string $imageName): self
     {
         $this->imageName = $imageName;
-
         return $this;
     }
 }

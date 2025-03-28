@@ -2,45 +2,48 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use App\Controller\SendProspectEmail;
 use App\Repository\ProspectMailRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass=ProspectMailRepository::class)
- */
+#[ORM\Entity(repositoryClass: ProspectMailRepository::class)]
 #[ApiResource(
-    collectionOperations: [
-    "post_prospect_mail" => [
-        'method' => 'POST',
-        'path' => '/prospect_mails/send',
-        'controller' => SendProspectEmail::class,
-        'denormalization_context' => ['groups' => ['write:ProspectMail:collection']]
-    ],
-],
-    itemOperations: []
+    operations: [
+        new Post(
+            uriTemplate: '/prospect_mails/send',
+            controller: SendProspectEmail::class,
+            denormalizationContext: ['groups' => ['write:ProspectMail:collection']]
+        ),
+    ]
 )]
 class ProspectMail
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['read:ProspectMail:item'])]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    #[Groups(['write:ProspectMail:collection'])]
-    private $email;
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Email(
+        message: "L'email {{ value }} n'est pas un email valide.",
+    )]
+    #[Groups(['write:ProspectMail:collection', 'read:ProspectMail:item'])]
+    private ?string $email = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $created_at;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['read:ProspectMail:item'])]
+    private ?\DateTimeInterface $created_at = null;
+
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -55,7 +58,6 @@ class ProspectMail
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -67,7 +69,6 @@ class ProspectMail
     public function setCreatedAt(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 }

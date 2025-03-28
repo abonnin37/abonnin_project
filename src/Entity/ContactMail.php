@@ -2,37 +2,32 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use App\Controller\SendContactEmail;
 use App\Repository\ContactMailRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass=ContactMailRepository::class)
- */
+#[ORM\Entity(repositoryClass: ContactMailRepository::class)]
 #[ApiResource(
-    collectionOperations: [
-        "post_contact_mail" => [
-            'method' => 'POST',
-            'path' => '/contact_mails/send',
-            'controller' => SendContactEmail::class,
-        ],
-    ],
-    itemOperations: []
+    operations: [
+        new Post(
+            uriTemplate: '/contact_mails/send',
+            controller: SendContactEmail::class,
+        ),
+    ]
 )]
 class ContactMail
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['read:ContactMail:item'])]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     #[Assert\NotBlank]
     #[Assert\Length(
         min: 2,
@@ -40,11 +35,10 @@ class ContactMail
         minMessage: 'Le prénom doit avoir au moins  {{ limit }} caractères.',
         maxMessage: 'Le prénom doit avoir au plus  {{ limit }} caractères.',
     )]
-    private $firstName;
+    #[Groups(['read:ContactMail:item'])]
+    private ?string $firstName = null;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     #[Assert\NotBlank]
     #[Assert\Length(
         min: 2,
@@ -52,11 +46,10 @@ class ContactMail
         minMessage: 'Le nom doit avoir au moins  {{ limit }} caractères.',
         maxMessage: 'Le nom doit avoir au plus  {{ limit }} caractères.',
     )]
-    private $lastName;
+    #[Groups(['read:ContactMail:item'])]
+    private ?string $lastName = null;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     #[Assert\NotBlank]
     #[Assert\Length(
         min: 2,
@@ -67,11 +60,10 @@ class ContactMail
     #[Assert\Email(
         message: "L'email {{ value }} n'est pas un email valide.",
     )]
-    private $email;
+    #[Groups(['read:ContactMail:item'])]
+    private ?string $email = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
     #[Assert\Length(
         min: 2,
@@ -79,22 +71,21 @@ class ContactMail
         minMessage: 'Le sujet doit avoir au moins  {{ limit }} caractères.',
         maxMessage: 'Le sujet doit avoir au plus  {{ limit }} caractères.',
     )]
-    private $subject;
+    #[Groups(['read:ContactMail:item'])]
+    private ?string $subject = null;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     #[Assert\NotBlank]
     #[Assert\Length(
         min: 20,
         minMessage: 'Le message doit avoir au moins  {{ limit }} caractères.',
     )]
-    private $message;
+    #[Groups(['read:ContactMail:item'])]
+    private ?string $message = null;
 
-    /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     */
-    private $company;
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['read:ContactMail:item'])]
+    private ?string $company = null;
 
     public function getId(): ?int
     {
@@ -109,7 +100,6 @@ class ContactMail
     public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
-
         return $this;
     }
 
@@ -121,7 +111,6 @@ class ContactMail
     public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
-
         return $this;
     }
 
@@ -133,7 +122,6 @@ class ContactMail
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -145,7 +133,6 @@ class ContactMail
     public function setSubject(string $subject): self
     {
         $this->subject = $subject;
-
         return $this;
     }
 
@@ -157,7 +144,6 @@ class ContactMail
     public function setMessage(string $message): self
     {
         $this->message = $message;
-
         return $this;
     }
 
@@ -169,7 +155,6 @@ class ContactMail
     public function setCompany(?string $company): self
     {
         $this->company = $company;
-
         return $this;
     }
 }

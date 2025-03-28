@@ -2,48 +2,69 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity(repositoryClass=CategoryRepository::class)
- */
+#[ORM\Entity(repositoryClass: CategoryRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Get(),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        )
+    ]
+)]
 class Category
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Category:item'])]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="categories")
-     */
-    private $parent;
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'categories')]
+    #[Groups(['read:Category:item'])]
+    private ?self $parent = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Category::class, mappedBy="parent")
-     */
-    private $categories;
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    #[Groups(['read:Category:item'])]
+    private Collection $categories;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $title;
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:Category:item'])]
+    private ?string $title = null;
 
-    /**
-     * @ORM\Column(type="text")
-     */
-    private $summary;
+    #[ORM\Column(type: 'text')]
+    #[Groups(['read:Category:item'])]
+    private ?string $summary = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Post::class, inversedBy="categories")
-     */
-    private $posts;
+    #[ORM\ManyToMany(targetEntity: Post::class, inversedBy: 'categories')]
+    #[Groups(['read:Category:item'])]
+    private Collection $posts;
 
     public function __construct()
     {
@@ -64,12 +85,11 @@ class Category
     public function setParent(?self $parent): self
     {
         $this->parent = $parent;
-
         return $this;
     }
 
     /**
-     * @return Collection|self[]
+     * @return Collection<int, self>
      */
     public function getCategories(): Collection
     {
@@ -82,19 +102,16 @@ class Category
             $this->categories[] = $category;
             $category->setParent($this);
         }
-
         return $this;
     }
 
     public function removeCategory(self $category): self
     {
         if ($this->categories->removeElement($category)) {
-            // set the owning side to null (unless already changed)
             if ($category->getParent() === $this) {
                 $category->setParent(null);
             }
         }
-
         return $this;
     }
 
@@ -106,7 +123,6 @@ class Category
     public function setTitle(string $title): self
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -118,12 +134,11 @@ class Category
     public function setSummary(string $summary): self
     {
         $this->summary = $summary;
-
         return $this;
     }
 
     /**
-     * @return Collection|Post[]
+     * @return Collection<int, Post>
      */
     public function getPosts(): Collection
     {
@@ -135,14 +150,12 @@ class Category
         if (!$this->posts->contains($post)) {
             $this->posts[] = $post;
         }
-
         return $this;
     }
 
     public function removePost(Post $post): self
     {
         $this->posts->removeElement($post);
-
         return $this;
     }
 }

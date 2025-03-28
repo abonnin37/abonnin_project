@@ -1,0 +1,35 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: API Alexandre Bonnin
+            description: API pour le portfolio d'Alexandre Bonnin
+            version: 1.0.0
+            contact:
+                name: Alexandre Bonnin
+                email: contact@alexandrebonnin.fr
+            license:
+                name: Propriétaire
+                url: https://alexandrebonnin.fr
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []
+    areas:
+        path_patterns:
+            - ^/api/(?!doc$)
+    sandbox:
+        enabled: true
+        accept_type: application/json
+        body_format: form
+        request_format:
+            method: content_type
+        custom_headers:
+            Accept: application/json
+            Content-Type: application/json
+    cache:
+        enabled: true
+        pool: cache.app

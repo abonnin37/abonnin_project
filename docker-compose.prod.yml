@@ -1,16 +1,13 @@
 services:
-  backend-alexandrebonnin-fr:
-    container_name: backend-alexandrebonnin-fr
+  app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     restart: always
-    working_dir: /var/www/html
     environment:
-      APP_ENV: "${APP_ENV}"
-      DATABASE_URL: "${DATABASE_URL}"
+      - APP_ENV=prod
+      - DATABASE_URL=${DATABASE_URL}
     volumes:
-      - volume_data:/var/www/html
       - ./apache2/default.conf:/etc/apache2/sites-available/000-default.conf
       - /var/projects/env_files/backend.alexandrebonnin.fr.env:/var/www/html/.env
     labels:
@@ -25,7 +22,4 @@ services:
 
 networks:
   traefik_default:
-    external: true
-
-volumes:
-  volume_data:
+    external: true 

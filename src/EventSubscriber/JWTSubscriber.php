@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class JWTSubscriber implements EventSubscriberInterface
 {
-    public function onLexikJwtAuthenticationOnJwtCreated(JWTCreatedEvent $event)
+    public function onLexikJwtAuthenticationOnJwtCreated(JWTCreatedEvent $event): void
     {
         // C'est ici qu'on va ajouter des informations en plus à notre token
         $data = $event->getData();
@@ -16,12 +16,13 @@ class JWTSubscriber implements EventSubscriberInterface
 
         if ($user instanceof User) {
             $data['email'] = $user->getEmail();
+            $data['roles'] = $user->getRoles();
         }
 
         $event->setData($data);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'lexik_jwt_authentication.on_jwt_created' => 'onLexikJwtAuthenticationOnJwtCreated',

@@ -2,63 +2,83 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\PostCommentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity(repositoryClass=PostCommentRepository::class)
- */
+#[ORM\Entity(repositoryClass: PostCommentRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Get(),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        )
+    ]
+)]
 class PostComment
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['read:PostComment:item'])]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Post::class, inversedBy="postComments")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $post;
+    #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'postComments')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:PostComment:item'])]
+    private ?Post $post = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=PostComment::class, inversedBy="postComments")
-     */
-    private $parent;
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'postComments')]
+    #[Groups(['read:PostComment:item'])]
+    private ?self $parent = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=PostComment::class, mappedBy="parent")
-     */
-    private $postComments;
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    #[Groups(['read:PostComment:item'])]
+    private Collection $postComments;
 
-    /**
-     * @ORM\Column(type="text")
-     */
-    private $content;
+    #[ORM\Column(type: 'text')]
+    #[Groups(['read:PostComment:item'])]
+    private ?string $content = null;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $published;
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:PostComment:item'])]
+    private bool $published = false;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $created_at;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['read:PostComment:item'])]
+    private ?\DateTimeInterface $created_at = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $published_at;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['read:PostComment:item'])]
+    private ?\DateTimeInterface $published_at = null;
 
     public function __construct()
     {
         $this->postComments = new ArrayCollection();
+        $this->created_at = new \DateTime();
     }
 
     public function getId(): ?int
@@ -74,7 +94,6 @@ class PostComment
     public function setPost(?Post $post): self
     {
         $this->post = $post;
-
         return $this;
     }
 
@@ -86,12 +105,11 @@ class PostComment
     public function setParent(?self $parent): self
     {
         $this->parent = $parent;
-
         return $this;
     }
 
     /**
-     * @return Collection|self[]
+     * @return Collection<int, self>
      */
     public function getPostComments(): Collection
     {
@@ -104,19 +122,16 @@ class PostComment
             $this->postComments[] = $postComment;
             $postComment->setParent($this);
         }
-
         return $this;
     }
 
     public function removePostComment(self $postComment): self
     {
         if ($this->postComments->removeElement($postComment)) {
-            // set the owning side to null (unless already changed)
             if ($postComment->getParent() === $this) {
                 $postComment->setParent(null);
             }
         }
-
         return $this;
     }
 
@@ -128,11 +143,10 @@ class PostComment
     public function setContent(string $content): self
     {
         $this->content = $content;
-
         return $this;
     }
 
-    public function getPublished(): ?bool
+    public function getPublished(): bool
     {
         return $this->published;
     }
@@ -140,7 +154,6 @@ class PostComment
     public function setPublished(bool $published): self
     {
         $this->published = $published;
-
         return $this;
     }
 
@@ -152,7 +165,6 @@ class PostComment
     public function setCreatedAt(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 
@@ -164,7 +176,6 @@ class PostComment
     public function setPublishedAt(?\DateTimeInterface $published_at): self
     {
         $this->published_at = $published_at;
-
         return $this;
     }
 }

@@ -2,89 +2,81 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\CitationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity(repositoryClass=CitationRepository::class)
- */
+#[ORM\Entity(repositoryClass: CitationRepository::class)]
 #[ApiResource(
-    collectionOperations: [
-        "get",
-        "post" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-    ],
-    itemOperations: [
-        "get",
-        "put" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "patch" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "delete" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ]
+    operations: [
+        new GetCollection(),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Get(),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        )
     ]
 )]
 class Citation
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Citation:item'])]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $firstName;
+    #[ORM\Column(type: 'string', length: 50)]
+    #[Groups(['read:Citation:item'])]
+    private ?string $firstName = null;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $lastName;
+    #[ORM\Column(type: 'string', length: 50)]
+    #[Groups(['read:Citation:item'])]
+    private ?string $lastName = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $position;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Citation:item'])]
+    private ?string $position = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $company;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Citation:item'])]
+    private ?string $company = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $created_at;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['read:Citation:item'])]
+    private ?\DateTimeInterface $created_at = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="citations")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'citations')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:Citation:item'])]
+    private ?User $user = null;
 
-    /**
-     * @ORM\Column(type="text")
-     */
-    private $content;
+    #[ORM\Column(type: 'text')]
+    #[Groups(['read:Citation:item'])]
+    private ?string $content = null;
+
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -99,7 +91,6 @@ class Citation
     public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
-
         return $this;
     }
 
@@ -111,7 +102,6 @@ class Citation
     public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
-
         return $this;
     }
 
@@ -123,7 +113,6 @@ class Citation
     public function setPosition(?string $position): self
     {
         $this->position = $position;
-
         return $this;
     }
 
@@ -135,7 +124,6 @@ class Citation
     public function setCompany(?string $company): self
     {
         $this->company = $company;
-
         return $this;
     }
 
@@ -147,7 +135,6 @@ class Citation
     public function setCreatedAt(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 
@@ -159,7 +146,6 @@ class Citation
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -171,7 +157,6 @@ class Citation
     public function setContent(string $content): self
     {
         $this->content = $content;
-
         return $this;
     }
 }

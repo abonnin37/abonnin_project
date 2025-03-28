@@ -2,74 +2,62 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\TechnologyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity(repositoryClass=TechnologyRepository::class)
- */
+#[ORM\Entity(repositoryClass: TechnologyRepository::class)]
 #[ApiResource(
-    collectionOperations: [
-        "get",
-        "post" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-    ],
-    itemOperations: [
-        "get",
-        "put" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "patch" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "delete" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
+    operations: [
+        new GetCollection(),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Get(),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        )
     ],
     subresourceOperations: [
         'api_projects_technologies_get_subresource' => [
             'method' => 'GET',
             "normalization_context" => ["groups" => ["read:Technologies:item"]],
         ],
-    ],
+    ]
 )]
 class Technology
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     #[Groups(['read:Technologies:item'])]
-    private $id;
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['read:Technologies:item'])]
-    private $name;
+    private ?string $name = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Project::class, mappedBy="technologies")
-     */
-    private $projects;
+    #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'technologies')]
+    private Collection $projects;
 
     public function __construct()
     {
@@ -89,12 +77,11 @@ class Technology
     public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 
     /**
-     * @return Collection|Project[]
+     * @return Collection<int, Project>
      */
     public function getProjects(): Collection
     {
@@ -107,7 +94,6 @@ class Technology
             $this->projects[] = $project;
             $project->addTechnology($this);
         }
-
         return $this;
     }
 
@@ -116,7 +102,6 @@ class Technology
         if ($this->projects->removeElement($project)) {
             $project->removeTechnology($this);
         }
-
         return $this;
     }
 }

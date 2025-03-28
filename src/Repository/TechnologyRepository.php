@@ -7,10 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Technology|null find($id, $lockMode = null, $lockVersion = null)
- * @method Technology|null findOneBy(array $criteria, array $orderBy = null)
- * @method Technology[]    findAll()
- * @method Technology[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Technology>
  */
 class TechnologyRepository extends ServiceEntityRepository
 {
@@ -19,32 +16,28 @@ class TechnologyRepository extends ServiceEntityRepository
         parent::__construct($registry, Technology::class);
     }
 
-    // /**
-    //  * @return Technology[] Returns an array of Technology objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Technology[]
+     */
+    public function findAllOrdered(): array
     {
         return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
+            ->orderBy('t.name', 'ASC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Technology
+    /**
+     * @return Technology[]
+     */
+    public function findByProject(int $projectId): array
     {
         return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
+            ->join('t.projects', 'p')
+            ->andWhere('p.id = :projectId')
+            ->setParameter('projectId', $projectId)
+            ->orderBy('t.name', 'ASC')
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult();
     }
-    */
 }

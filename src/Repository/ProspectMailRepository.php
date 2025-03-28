@@ -7,10 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method ProspectMail|null find($id, $lockMode = null, $lockVersion = null)
- * @method ProspectMail|null findOneBy(array $criteria, array $orderBy = null)
- * @method ProspectMail[]    findAll()
- * @method ProspectMail[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<ProspectMail>
  */
 class ProspectMailRepository extends ServiceEntityRepository
 {
@@ -19,32 +16,26 @@ class ProspectMailRepository extends ServiceEntityRepository
         parent::__construct($registry, ProspectMail::class);
     }
 
-    // /**
-    //  * @return ProspectMail[] Returns an array of ProspectMail objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return ProspectMail[]
+     */
+    public function findAllOrdered(): array
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+            ->orderBy('p.created_at', 'DESC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?ProspectMail
+    /**
+     * @return ProspectMail[]
+     */
+    public function findLatest(int $limit = 10): array
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
+            ->orderBy('p.created_at', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult();
     }
-    */
 }

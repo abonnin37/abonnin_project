@@ -2,103 +2,77 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiSubresource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ProjectRepository::class)
- */
+#[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ApiResource(
-    collectionOperations: [
-        "get",
-        "post" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-    ],
-    itemOperations: [
-        "get",
-        "put" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "patch" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "delete" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
+    operations: [
+        new GetCollection(),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Get(),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        )
     ]
 )]
 class Project
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $begin_at;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $begin_at = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $end_at;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $end_at = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $excerpt;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $excerpt = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $description;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $url;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $url = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Image::class, mappedBy="project")
-     */
+    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'project')]
     #[ApiSubresource]
-    private $images;
+    private Collection $images;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Technology::class, inversedBy="projects")
-     */
+    #[ORM\ManyToMany(targetEntity: Technology::class, inversedBy: 'projects')]
     #[ApiSubresource]
-    private $technologies;
+    private Collection $technologies;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="projects")
-     */
-    private $user;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'projects')]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -119,7 +93,6 @@ class Project
     public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -131,7 +104,6 @@ class Project
     public function setBeginAt(\DateTimeInterface $begin_at): self
     {
         $this->begin_at = $begin_at;
-
         return $this;
     }
 
@@ -143,7 +115,6 @@ class Project
     public function setEndAt(\DateTimeInterface $end_at): self
     {
         $this->end_at = $end_at;
-
         return $this;
     }
 
@@ -155,7 +126,6 @@ class Project
     public function setExcerpt(string $excerpt): self
     {
         $this->excerpt = $excerpt;
-
         return $this;
     }
 
@@ -167,7 +137,6 @@ class Project
     public function setDescription(?string $description): self
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -179,61 +148,55 @@ class Project
     public function setUrl(?string $url): self
     {
         $this->url = $url;
-
         return $this;
     }
 
     /**
-     * @return Collection|image[]
+     * @return Collection<int, Image>
      */
     public function getImages(): Collection
     {
         return $this->images;
     }
 
-    public function addImage(image $image): self
+    public function addImage(Image $image): self
     {
         if (!$this->images->contains($image)) {
             $this->images[] = $image;
             $image->setProject($this);
         }
-
         return $this;
     }
 
-    public function removeImage(image $image): self
+    public function removeImage(Image $image): self
     {
         if ($this->images->removeElement($image)) {
-            // set the owning side to null (unless already changed)
             if ($image->getProject() === $this) {
                 $image->setProject(null);
             }
         }
-
         return $this;
     }
 
     /**
-     * @return Collection|technology[]
+     * @return Collection<int, Technology>
      */
     public function getTechnologies(): Collection
     {
         return $this->technologies;
     }
 
-    public function addTechnology(technology $technology): self
+    public function addTechnology(Technology $technology): self
     {
         if (!$this->technologies->contains($technology)) {
             $this->technologies[] = $technology;
         }
-
         return $this;
     }
 
-    public function removeTechnology(technology $technology): self
+    public function removeTechnology(Technology $technology): self
     {
         $this->technologies->removeElement($technology);
-
         return $this;
     }
 
@@ -245,7 +208,6 @@ class Project
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
         return $this;
     }
 }

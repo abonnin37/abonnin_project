@@ -4,3 +4,18 @@ lexik_jwt_authentication:
     pass_phrase: '%env(JWT_PASSPHRASE)%'
     token_ttl: 3600
     user_identity_field: id
+    allow_no_expiration: false
+    clock_skew: 0
+    api_platform:
+        check_path: /api/login_check
+        username_path: email
+        password_path: password
+    header_prefix: 'Bearer '
+    payload_fields_to_serialize: ['id', 'email', 'roles']
+    token_extractors:
+        authorization_header:
+            enabled: true
+        cookie:
+            enabled: false
+        query_string:
+            enabled: false

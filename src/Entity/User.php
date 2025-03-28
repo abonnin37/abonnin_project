@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiSubresource;
 use App\Controller\ChangePasswordController;
 use App\Controller\MeController;
 use App\Controller\ResetPassword;
@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,22 +25,19 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity("email", message="L'email utilisé n'est pas disponible")
  */
 #[ApiResource(
-    collectionOperations: [
-        "get" => [
-            "security" => "is_granted('ROLE_ADMIN')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "post" => [
-            'controller' => Signin::class,
-            "normalization_context" => ["groups" => ["write:User:collection"]]
-        ],
-        "postApiResetPasswordSendEmail" => [
-            'path' => '/resetPassword',
-            'method' => 'POST',
-            'controller' => SendResetPasswordMail::class,
-            'openapi_context' => [
+    operations: [
+        new \ApiPlatform\Metadata\GetCollection(
+            security: "is_granted('ROLE_ADMIN')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new \ApiPlatform\Metadata\Post(
+            controller: Signin::class,
+            normalizationContext: ["groups" => ["write:User:collection"]]
+        ),
+        new \ApiPlatform\Metadata\Post(
+            uriTemplate: '/resetPassword',
+            controller: SendResetPasswordMail::class,
+            openapiContext: [
                 'summary' => "Envoie d'un email à l'utilisateur pour la réinitialisation du mot de passe",
                 'description' => "Prend en paramètre l'adrese email de l'utilisateur puis envoie un email si l'utilisateur à bien un comtpe en base de données.",
                 'requestBody' => [
@@ -58,43 +56,32 @@ use Symfony\Component\Validator\Constraints as Assert;
                     ]
                 ],
             ],
-        ],
-    ],
-    itemOperations: [
-        "get",
-        "patch" => [
-            "security" => "is_granted('ROLE_USER')",
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "me" => [
-            "security" => "is_granted('ROLE_USER')",
-            'pagination_enabled' => false,
-            'path' => '/me',
-            'method' => 'GET',
-            'controller' => MeController::class,
-            'read' => false,
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "changePassword" => [
-            "security" => "is_granted('ROLE_USER')",
-            'pagination_enabled' => false,
-            'path' => '/users/{id}/changePassword',
-            'method' => 'PATCH',
-            'controller' => ChangePasswordController::class,
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ],
-        ],
-        "resetPassword" => [
-            'pagination_enabled' => false,
-            'path' => '/users/{id}/resetPassword',
-            'method' => 'PATCH',
-            'controller' => ResetPassword::class,
-            'openapi_context' => [
+        ),
+        new \ApiPlatform\Metadata\Get(),
+        new \ApiPlatform\Metadata\Patch(
+            security: "is_granted('ROLE_USER')",
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new \ApiPlatform\Metadata\Get(
+            uriTemplate: '/me',
+            controller: MeController::class,
+            security: "is_granted('ROLE_USER')",
+            paginationEnabled: false,
+            read: false,
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new \ApiPlatform\Metadata\Patch(
+            uriTemplate: '/users/{id}/changePassword',
+            controller: ChangePasswordController::class,
+            security: "is_granted('ROLE_USER')",
+            paginationEnabled: false,
+            openapiContext: ['security' => [['bearerAuth' => []]]]
+        ),
+        new \ApiPlatform\Metadata\Patch(
+            uriTemplate: '/users/{id}/resetPassword',
+            controller: ResetPassword::class,
+            paginationEnabled: false,
+            openapiContext: [
                 'summary' => "Met à jour le mot de passe de l'utilisateur",
                 'requestBody' => [
                     'content' => [
@@ -120,35 +107,41 @@ use Symfony\Component\Validator\Constraints as Assert;
                     ]
                 ],
             ],
-        ],
+        ),
     ],
     normalizationContext: ["groups" => ["read:User:item"]],
 )]
-class User implements UserInterface, JWTUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     #[Groups(['read:User:item'])]
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:User:item'])]
-    private $first_name;
+    private ?string $first_name = null;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:User:item'])]
-    private $last_name;
+    private ?string $last_name = null;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
+    #[ORM\Column(type: 'string', length: 50)]
     #[Groups(['read:User:item', 'write:User:collection'])]
     #[Assert\NotBlank(
         message: "L'email est requis."
@@ -162,11 +155,12 @@ class User implements UserInterface, JWTUserInterface
     #[Assert\Email(
         message: "L'email {{ value }} n'est pas un email valide.",
     )]
-    private $email;
+    private string $email;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
+    #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['write:User:collection'])]
     #[Assert\NotBlank(
         message: "Le mot de passe est requis."
@@ -193,53 +187,59 @@ class User implements UserInterface, JWTUserInterface
         minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractère.",
         maxMessage: "Le mot de passe doit contenir au plus {{ limit }} caractère."
     )]
-    private $password;
+    private string $password;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $registered_at;
+    #[ORM\Column(type: 'datetime')]
+    private \DateTimeInterface $registered_at;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $last_login;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $last_login = null;
 
     /**
      * @ORM\OneToMany(targetEntity=Post::class, mappedBy="user")
      */
-    #[ApiSubresource()]
-    private $posts;
+    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'user')]
+    #[ApiSubresource]
+    private Collection $posts;
 
     /**
      * @ORM\OneToMany(targetEntity=Project::class, mappedBy="user")
      */
     // https://api-platform.com/docs/core/subresources/#limiting-depth
-    #[ApiSubresource(
-        maxDepth: 1,
-    )]
-    private $projects;
+    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'user')]
+    #[ApiSubresource(maxDepth: 1)]
+    private Collection $projects;
 
     /**
      * @ORM\OneToMany(targetEntity=Citation::class, mappedBy="user")
      */
-    private $citations;
+    #[ORM\OneToMany(targetEntity: Citation::class, mappedBy: 'user')]
+    private Collection $citations;
 
     /**
      * @ORM\Column(type="array")
      */
+    #[ORM\Column(type: 'array')]
     #[Groups(['read:User:item'])]
-    private $roles = [];
+    private array $roles = [];
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $verified;
+    #[ORM\Column(type: 'boolean')]
+    private bool $verified = false;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $reset_token;
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private ?string $reset_token = null;
 
     public function __construct()
     {

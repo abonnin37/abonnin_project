@@ -12,8 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
@@ -27,7 +27,7 @@ class Signin extends AbstractController
     {
     }
 
-    public function __invoke(User $data, EntityManagerInterface $entityManager, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator, Request $request)
+    public function __invoke(User $data, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator, Request $request)
     {
         $requestContent = json_decode($request->getContent(), true);
 
@@ -56,9 +56,9 @@ class Signin extends AbstractController
             );
         }
 
-        // We crypte the password
-        $cryptedPassword = $encoder->encodePassword($data, $data->getPassword());
-        $data->setPassword($cryptedPassword);
+        // We hash the password
+        $hashedPassword = $passwordHasher->hashPassword($data, $data->getPassword());
+        $data->setPassword($hashedPassword);
         $data->setVerified(false);
 
         // When the $data is flushed, symfony actualise it with the new id

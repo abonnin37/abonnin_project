@@ -1,2 +1,27 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
+    debug: '%kernel.debug%'
+    strict_variables: '%kernel.debug%'
+    exception_controller: null
+    form_themes: ['bootstrap_5_layout.html.twig']
+    globals:
+        app_name: 'Alexandre Bonnin'
+        app_version: '1.0.0'
+    paths:
+        '%kernel.project_dir%/templates': ~
+    date:
+        format: 'Y-m-d'
+        interval_format: '%%d days'
+        timezone: 'Europe/Paris'
+    number_format:
+        decimal: ','
+        thousands_separator: ' '
+    autoescape: 'html'
+    autoescape_service: null
+    autoescape_service_method: null
+    optimizations: ~
+    charset: UTF-8
+    base_template_class: null
+    cache: '%kernel.cache_dir%/twig'
+    auto_reload: '%kernel.debug%'
+    strict_variables: '%kernel.debug%'

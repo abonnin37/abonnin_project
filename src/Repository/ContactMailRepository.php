@@ -7,10 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method ContactMail|null find($id, $lockMode = null, $lockVersion = null)
- * @method ContactMail|null findOneBy(array $criteria, array $orderBy = null)
- * @method ContactMail[]    findAll()
- * @method ContactMail[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<ContactMail>
  */
 class ContactMailRepository extends ServiceEntityRepository
 {
@@ -19,32 +16,26 @@ class ContactMailRepository extends ServiceEntityRepository
         parent::__construct($registry, ContactMail::class);
     }
 
-    // /**
-    //  * @return ContactMail[] Returns an array of ContactMail objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return ContactMail[]
+     */
+    public function findAllOrdered(): array
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
+            ->orderBy('c.created_at', 'DESC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?ContactMail
+    /**
+     * @return ContactMail[]
+     */
+    public function findLatest(int $limit = 10): array
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
+            ->orderBy('c.created_at', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult();
     }
-    */
 }

@@ -1,30 +1,28 @@
 <?php
 
-
 namespace App\OpenApi;
 
-
-use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
-use ApiPlatform\Core\OpenApi\Model\Operation;
-use ApiPlatform\Core\OpenApi\Model\PathItem;
-use ApiPlatform\Core\OpenApi\Model\RequestBody;
-use ApiPlatform\Core\OpenApi\OpenApi;
+use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\PathItem;
+use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\OpenApi\OpenApi;
 
 class OpenApiFactory implements OpenApiFactoryInterface
 {
-    public function __construct(private OpenApiFactoryInterface $decorated)
-    {
+    public function __construct(
+        private readonly OpenApiFactoryInterface $decorated
+    ) {
     }
 
     public function __invoke(array $context = []): OpenApi
     {
         $openApi = $this->decorated->__invoke($context);
 
-        /** @var PathItem $path */
         // On parcourt toutes les routes de l'api
         foreach ($openApi->getPaths()->getPaths() as $key => $path) {
             // On récupère les informations sur la méthode GET et on test si l'information du Summary est hidden
-            if($path->getGet() && $path->getGet()->getSummary() === 'hidden') {
+            if ($path->getGet() && $path->getGet()->getSummary() === 'hidden') {
                 // si c'est vrai on retire la route de la liste
                 $openApi->getPaths()->addPath($key, $path->withGet(null));
             }
@@ -37,20 +35,17 @@ class OpenApiFactory implements OpenApiFactoryInterface
             'bearerFormat' => 'JWT'
         ]);
 
-        // Applique une sécurité à toutes les routes
-        //$openApi = $openApi->withSecurity(['cookieAuth']);
-
         $schemas = $openApi->getComponents()->getSchemas();
         $schemas['Credentials'] = new \ArrayObject([
             'type' => 'object',
             'properties' => [
                 'username' => [
                     'type' => 'string',
-                    'exemple' => 'bonnin.a.k@gmail.com',
+                    'example' => 'bonnin.a.k@gmail.com',
                 ],
                 'password' => [
                     'type' => 'string',
-                    'exemple' => 'password',
+                    'example' => 'password',
                 ],
             ],
         ]);
@@ -62,6 +57,10 @@ class OpenApiFactory implements OpenApiFactoryInterface
                     'type' => 'string',
                     'readOnly' => true,
                 ],
+                'refresh_token' => [
+                    'type' => 'string',
+                    'readOnly' => true,
+                ],
             ],
         ]);
 
@@ -70,7 +69,7 @@ class OpenApiFactory implements OpenApiFactoryInterface
             post: new Operation(
                 operationId: 'postApiLogin',
                 tags: ['Auth'],
-                responses:[
+                responses: [
                     '200' => [
                         'description' => 'Token JWT',
                         'content' => [
@@ -101,7 +100,7 @@ class OpenApiFactory implements OpenApiFactoryInterface
             post: new Operation(
                 operationId: 'postApiLogout',
                 tags: ['Auth'],
-                responses:[
+                responses: [
                     '204' => []
                 ],
             )

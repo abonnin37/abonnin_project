@@ -7,10 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method PostComment|null find($id, $lockMode = null, $lockVersion = null)
- * @method PostComment|null findOneBy(array $criteria, array $orderBy = null)
- * @method PostComment[]    findAll()
- * @method PostComment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<PostComment>
  */
 class PostCommentRepository extends ServiceEntityRepository
 {
@@ -19,32 +16,28 @@ class PostCommentRepository extends ServiceEntityRepository
         parent::__construct($registry, PostComment::class);
     }
 
-    // /**
-    //  * @return PostComment[] Returns an array of PostComment objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return PostComment[]
+     */
+    public function findByPost(int $postId): array
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.post = :postId')
+            ->setParameter('postId', $postId)
+            ->orderBy('c.created_at', 'DESC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?PostComment
+    /**
+     * @return PostComment[]
+     */
+    public function findLatest(int $limit = 10): array
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.created_at', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult();
     }
-    */
 }

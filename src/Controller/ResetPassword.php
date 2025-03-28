@@ -1,27 +1,28 @@
 <?php
 
-
 namespace App\Controller;
-
 
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ResetPassword extends AbstractController
 {
     public function __construct(
-        private Security $security
-    )
-    {
+        private readonly Security $security
+    ) {
     }
 
-    public function __invoke(User $data, Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator)
-    {
+    public function __invoke(
+        User $data,
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        ValidatorInterface $validator
+    ): Response {
         $requestContent = json_decode($request->getContent(), true);
 
         // We test if the token is valid
@@ -49,11 +50,10 @@ class ResetPassword extends AbstractController
         $errors = $validator->validate($data);
 
         if (count($errors) > 0) {
-            $errorsString = "";
-
-            for($i = 0; $i < count($errors); $i++) {
-                $errorsString .= $errors->get($i)->getMessage()."\n";
-            }
+            $errorsString = implode("\n", array_map(
+                fn($error) => $error->getMessage(),
+                iterator_to_array($errors)
+            ));
 
             return new Response(
                 json_encode(["message" => $errorsString]),
@@ -62,12 +62,22 @@ class ResetPassword extends AbstractController
             );
         }
 
+        try {
+            $data->setResetToken(null);
+            $hashedPassword = $passwordHasher->hashPassword($data, $requestContent['newPassword']);
+            $data->setPassword($hashedPassword);
 
-
-        $data->setResetToken(null);
-        $data->setPassword($encoder->encodePassword($data, $requestContent['newPassword']));
-
-        return $data;
+            return new Response(
+                json_encode(["message" => "Mot de passe réinitialisé avec succès"]),
+                Response::HTTP_OK,
+                ['content-type' => 'application/json']
+            );
+        } catch (\Exception $e) {
+            return new Response(
+                json_encode(["message" => "Une erreur est survenue lors de la réinitialisation du mot de passe"]),
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                ['content-type' => 'application/json']
+            );
+        }
     }
-
 }

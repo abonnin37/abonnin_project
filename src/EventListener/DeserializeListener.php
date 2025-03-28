@@ -1,72 +1,63 @@
 <?php
 
-
 namespace App\EventListener;
 
-use ApiPlatform\Core\EventListener\DeserializeListener as DecoratedListener;
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\EventListener\DeserializeListener as DecoratedListener;
+use ApiPlatform\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-
 class DeserializeListener
 {
-    /**
-     * @var array
-     */
-    private static $formats;
+    private static array $formats;
 
     public function __construct(
-        private DecoratedListener $decorated,
-        private SerializerContextBuilderInterface $serializerContextBuilder,
-        private DenormalizerInterface $denormalizer,
-    )
-    {
-
+        private readonly DecoratedListener $decorated,
+        private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+        private readonly DenormalizerInterface $denormalizer,
+    ) {
     }
 
-    public function onKernelRequest (RequestEvent $event): void {
+    public function onKernelRequest(RequestEvent $event): void
+    {
         $request = $event->getRequest();
 
-        if($request->isMethodCacheable() || $request->isMethod(Request::METHOD_DELETE)){
+        if ($request->isMethodCacheable() || $request->isMethod(Request::METHOD_DELETE)) {
             return;
         }
 
-        if ($this->getContentType($request) === 'multipart'){
+        if ($this->getContentType($request) === 'multipart') {
             $this->denormalizeFromRequest($request);
         } else {
             $this->decorated->onKernelRequest($event);
         }
     }
 
-    private function denormalizeFromRequest(Request $request): void {
+    private function denormalizeFromRequest(Request $request): void
+    {
         $attributes = RequestAttributesExtractor::extractAttributes($request);
-        if(empty($attributes)) {
+        if (empty($attributes)) {
             return;
         }
 
-        $context =$this->serializerContextBuilder->createFromRequest($request, false, $attributes);
-        $polulated = $request->attributes->get('data');
-        if ($polulated !== null) {
-            $context['object_to_populate'] = $polulated;
+        $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
+        $populated = $request->attributes->get('data');
+        if ($populated !== null) {
+            $context['object_to_populate'] = $populated;
         }
 
         $dataRequest = $request->request->all();
         // Get the boolean value set right
-        if ($attributes["resource_class"] === "App\Entity\Post"){
-            if ($dataRequest["published"] && $dataRequest["published"] === "true") {
-                $dataRequest["published"] = true;
-            } else {
-                $dataRequest["published"] = false;
-            }
+        if ($attributes['resource_class'] === 'App\Entity\Post') {
+            $dataRequest['published'] = isset($dataRequest['published']) && $dataRequest['published'] === 'true';
         }
         $files = $request->files->all();
 
-        // We test if the receive a file with a PUT method, if not, we put the old file in the $files variable
-        if ($attributes["resource_class"] === "App\Entity\Post" && $context["operation_type"] === "item" && $context["item_operation_name"] === "put" && empty($files)) {
-            $files = ["imageFile" => null]; // Trouver un moyen de récupérer le fichier déjà présent
+        // We test if we receive a file with a PUT method, if not, we put the old file in the $files variable
+        if ($attributes['resource_class'] === 'App\Entity\Post' && $context['operation_type'] === 'item' && $context['item_operation_name'] === 'put' && empty($files)) {
+            $files = ['imageFile' => null];
         }
 
         $object = $this->denormalizer->denormalize(
@@ -79,7 +70,8 @@ class DeserializeListener
         $request->attributes->set('data', $object);
     }
 
-    private function getContentType(Request $request): ?string {
+    private function getContentType(Request $request): ?string
+    {
         $mimeType = $request->headers->get('CONTENT_TYPE');
 
         $canonicalMimeType = null;
@@ -106,7 +98,7 @@ class DeserializeListener
     /**
      * Initializes HTTP request formats.
      */
-    private static function initializeFormats()
+    private static function initializeFormats(): void
     {
         static::$formats = [
             'html' => ['text/html', 'application/xhtml+xml'],
