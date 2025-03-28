@@ -8,8 +8,11 @@ services:
       - APP_ENV=prod
       - DATABASE_URL=${DATABASE_URL}
     volumes:
+      - volume_data:/var/www/html
       - ./apache2/default.conf:/etc/apache2/sites-available/000-default.conf
       - /var/projects/env_files/backend.alexandrebonnin.fr.env:/var/www/html/.env
+      - /var/www/html/vendor
+      - /var/www/html/var
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend-alexandrebonnin-fr.rule=Host(`backend.alexandrebonnin.fr`)"
@@ -22,4 +25,7 @@ services:
 
 networks:
   traefik_default:
-    external: true 
+    external: true
+
+volumes:
+  volume_data:
