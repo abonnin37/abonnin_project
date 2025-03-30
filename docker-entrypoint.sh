@@ -1,7 +1,10 @@
 #!/bin/sh
 
-# Démarrage de PHP-FPM en arrière-plan
-php-fpm &
+# Attendre que PHP-FPM soit prêt
+php-fpm --daemonize
 
-# Démarrage d'Apache en premier plan
+# Attendre un peu pour s'assurer que PHP-FPM est bien démarré
+sleep 2
+
+# Démarrer Apache en premier plan
 exec httpd -DFOREGROUND 
