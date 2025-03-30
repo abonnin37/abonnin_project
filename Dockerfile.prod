@@ -18,15 +18,6 @@ RUN apk add --no-cache \
     && docker-php-ext-configure zip \
     && docker-php-ext-install pdo pdo_mysql zip opcache
 
-# Activation des modules Apache nécessaires
-RUN sed -i '/#LoadModule rewrite_module/s/^#//g' /etc/apache2/httpd.conf \
-    && sed -i '/#LoadModule headers_module/s/^#//g' /etc/apache2/httpd.conf \
-    && sed -i '/#LoadModule deflate_module/s/^#//g' /etc/apache2/httpd.conf \
-    && sed -i '/#LoadModule ssl_module/s/^#//g' /etc/apache2/httpd.conf \
-    && sed -i '/#LoadModule proxy_module/s/^#//g' /etc/apache2/httpd.conf \
-    && sed -i '/#LoadModule proxy_fcgi_module/s/^#//g' /etc/apache2/httpd.conf \
-    && echo "ServerName localhost" >> /etc/apache2/httpd.conf
-
 # Installation de Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
