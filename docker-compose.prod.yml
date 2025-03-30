@@ -7,6 +7,7 @@ services:
     restart: always
     environment:
       - APP_ENV=prod
+      - SYMFONY_ENV=prod
       - DATABASE_URL=${DATABASE_URL}
     volumes:
       - volume_data:/var/www/html
