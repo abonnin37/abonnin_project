@@ -5,7 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
@@ -19,22 +19,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(),
-        new Post(
-            security: "is_granted('ROLE_ADMIN')",
-            openapiContext: ['security' => [['bearerAuth' => []]]]
+        new ApiPost(
+            openapiContext: ['security' => [['bearerAuth' => []]]],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Get(),
         new Put(
-            security: "is_granted('ROLE_ADMIN')",
-            openapiContext: ['security' => [['bearerAuth' => []]]]
+            openapiContext: ['security' => [['bearerAuth' => []]]],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Patch(
-            security: "is_granted('ROLE_ADMIN')",
-            openapiContext: ['security' => [['bearerAuth' => []]]]
+            openapiContext: ['security' => [['bearerAuth' => []]]],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Delete(
-            security: "is_granted('ROLE_ADMIN')",
-            openapiContext: ['security' => [['bearerAuth' => []]]]
+            openapiContext: ['security' => [['bearerAuth' => []]]],
+            security: "is_granted('ROLE_ADMIN')"
         )
     ]
 )]
@@ -50,7 +50,7 @@ class Category
     #[Groups(['read:Category:item'])]
     private ?self $parent = null;
 
-    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     #[Groups(['read:Category:item'])]
     private Collection $categories;
 
@@ -62,7 +62,7 @@ class Category
     #[Groups(['read:Category:item'])]
     private ?string $summary = null;
 
-    #[ORM\ManyToMany(targetEntity: Post::class, inversedBy: 'categories')]
+    #[ORM\ManyToMany(targetEntity: \App\Entity\Post::class, inversedBy: 'categories')]
     #[Groups(['read:Category:item'])]
     private Collection $posts;
 

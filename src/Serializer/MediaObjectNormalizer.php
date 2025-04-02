@@ -15,6 +15,7 @@ final class MediaObjectNormalizer implements ContextAwareNormalizerInterface, No
     use NormalizerAwareTrait;
 
     private const ALREADY_CALLED = 'MEDIA_OBJECT_NORMALIZER_ALREADY_CALLED';
+    private const URL_CACHE = 'MEDIA_OBJECT_URL_CACHE';
 
     public function __construct(
         private readonly StorageInterface $storage
@@ -23,13 +24,25 @@ final class MediaObjectNormalizer implements ContextAwareNormalizerInterface, No
 
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
+        if (isset($context[self::ALREADY_CALLED])) {
+            return $this->normalizer->normalize($object, $format, $context);
+        }
+
         $context[self::ALREADY_CALLED] = true;
 
         if ($object instanceof Image) {
-            $object->setContentUrl($this->storage->resolveUri($object, 'imageFile'));
+            $cacheKey = 'image_' . $object->getId();
+            if (!isset($context[self::URL_CACHE][$cacheKey])) {
+                $context[self::URL_CACHE][$cacheKey] = $this->storage->resolveUri($object, 'imageFile');
+            }
+            $object->setContentUrl($context[self::URL_CACHE][$cacheKey]);
         }
         if ($object instanceof Post) {
-            $object->setImageUrl($this->storage->resolveUri($object, 'imageFile'));
+            $cacheKey = 'post_' . $object->getId();
+            if (!isset($context[self::URL_CACHE][$cacheKey])) {
+                $context[self::URL_CACHE][$cacheKey] = $this->storage->resolveUri($object, 'imageFile');
+            }
+            $object->setImageUrl($context[self::URL_CACHE][$cacheKey]);
         }
 
         return $this->normalizer->normalize($object, $format, $context);

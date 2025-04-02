@@ -64,10 +64,10 @@ class Citation
     #[Groups(['read:Citation:item'])]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'citations')]
+    #[ORM\ManyToOne(targetEntity: \App\Entity\User::class, inversedBy: 'citations')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:Citation:item'])]
-    private ?User $user = null;
+    private ?\App\Entity\User $user = null;
 
     #[ORM\Column(type: 'text')]
     #[Groups(['read:Citation:item'])]

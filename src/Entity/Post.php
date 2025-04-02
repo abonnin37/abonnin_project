@@ -61,7 +61,10 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             ]
         ),
         new GetCollection(
-            normalizationContext: ["groups" => ["read:Post:item"]]
+            normalizationContext: ["groups" => ["read:Post:item"]],
+            paginationEnabled: true,
+            paginationItemsPerPage: 10,
+            paginationMaximumItemsPerPage: 100
         ),
         new Delete(
             security: "is_granted('ROLE_ADMIN')",

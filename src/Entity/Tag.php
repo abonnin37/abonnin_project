@@ -5,7 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(),
-        new Post(
+        new ApiPost(
             security: "is_granted('ROLE_ADMIN')",
             openapiContext: ['security' => [['bearerAuth' => []]]]
         ),
@@ -54,7 +54,7 @@ class Tag
     #[Groups(['read:Tag:item'])]
     private ?string $summary = null;
 
-    #[ORM\ManyToMany(targetEntity: Post::class, inversedBy: 'tags')]
+    #[ORM\ManyToMany(targetEntity: \App\Entity\Post::class, inversedBy: 'tags')]
     #[Groups(['read:Tag:item'])]
     private Collection $posts;
 

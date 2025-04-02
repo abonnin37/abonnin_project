@@ -71,8 +71,8 @@ class Project
     #[ApiSubresource]
     private Collection $technologies;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'projects')]
-    private ?User $user = null;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\User::class, inversedBy: 'projects')]
+    private ?\App\Entity\User $user = null;
 
     public function __construct()
     {
@@ -200,12 +200,12 @@ class Project
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): ?\App\Entity\User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(?\App\Entity\User $user): self
     {
         $this->user = $user;
         return $this;

@@ -5,7 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Post as ApiPost;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(),
-        new Post(
+        new ApiPost(
             security: "is_granted('ROLE_ADMIN')",
             openapiContext: ['security' => [['bearerAuth' => []]]]
         ),
@@ -46,10 +46,10 @@ class PostComment
     #[Groups(['read:PostComment:item'])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'postComments')]
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Post::class, inversedBy: 'postComments')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:PostComment:item'])]
-    private ?Post $post = null;
+    private ?\App\Entity\Post $post = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'postComments')]
     #[Groups(['read:PostComment:item'])]

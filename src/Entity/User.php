@@ -20,15 +20,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass=UserRepository::class)
- * @UniqueEntity("email", message="L'email utilisé n'est pas disponible")
- */
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity("email", message: "L'email utilisé n'est pas disponible")]
 #[ApiResource(
     operations: [
         new \ApiPlatform\Metadata\GetCollection(
-            security: "is_granted('ROLE_ADMIN')",
-            openapiContext: ['security' => [['bearerAuth' => []]]]
+            openapiContext: ['security' => [['bearerAuth' => []]]],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new \ApiPlatform\Metadata\Post(
             controller: Signin::class,
@@ -59,28 +57,27 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new \ApiPlatform\Metadata\Get(),
         new \ApiPlatform\Metadata\Patch(
-            security: "is_granted('ROLE_USER')",
-            openapiContext: ['security' => [['bearerAuth' => []]]]
+            openapiContext: ['security' => [['bearerAuth' => []]]],
+            security: "is_granted('ROLE_USER')"
         ),
         new \ApiPlatform\Metadata\Get(
             uriTemplate: '/me',
             controller: MeController::class,
-            security: "is_granted('ROLE_USER')",
+            openapiContext: ['security' => [['bearerAuth' => []]]],
             paginationEnabled: false,
-            read: false,
-            openapiContext: ['security' => [['bearerAuth' => []]]]
+            security: "is_granted('ROLE_USER')",
+            provider: MeController::class
         ),
         new \ApiPlatform\Metadata\Patch(
             uriTemplate: '/users/{id}/changePassword',
             controller: ChangePasswordController::class,
-            security: "is_granted('ROLE_USER')",
+            openapiContext: ['security' => [['bearerAuth' => []]]],
             paginationEnabled: false,
-            openapiContext: ['security' => [['bearerAuth' => []]]]
+            security: "is_granted('ROLE_USER')"
         ),
         new \ApiPlatform\Metadata\Patch(
             uriTemplate: '/users/{id}/resetPassword',
             controller: ResetPassword::class,
-            paginationEnabled: false,
             openapiContext: [
                 'summary' => "Met à jour le mot de passe de l'utilisateur",
                 'requestBody' => [
@@ -107,40 +104,27 @@ use Symfony\Component\Validator\Constraints as Assert;
                     ]
                 ],
             ],
+            paginationEnabled: false,
         ),
     ],
     normalizationContext: ["groups" => ["read:User:item"]],
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups(['read:User:item'])]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:User:item'])]
     private ?string $first_name = null;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:User:item'])]
     private ?string $last_name = null;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
     #[ORM\Column(type: 'string', length: 50)]
     #[Groups(['read:User:item', 'write:User:collection'])]
     #[Assert\NotBlank(
@@ -157,9 +141,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     )]
     private string $email;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['write:User:collection'])]
     #[Assert\NotBlank(
@@ -189,55 +170,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     )]
     private string $password;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $registered_at;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $last_login = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="user")
-     */
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: \App\Entity\Post::class, mappedBy: 'user')]
     #[ApiSubresource]
     private Collection $posts;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Project::class, mappedBy="user")
-     */
-    // https://api-platform.com/docs/core/subresources/#limiting-depth
-    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: \App\Entity\Project::class, mappedBy: 'user')]
     #[ApiSubresource(maxDepth: 1)]
     private Collection $projects;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Citation::class, mappedBy="user")
-     */
-    #[ORM\OneToMany(targetEntity: Citation::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: \App\Entity\Citation::class, mappedBy: 'user')]
     private Collection $citations;
 
-    /**
-     * @ORM\Column(type="array")
-     */
     #[ORM\Column(type: 'array')]
     #[Groups(['read:User:item'])]
     private array $roles = [];
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
     #[ORM\Column(type: 'boolean')]
     private bool $verified = false;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private ?string $reset_token = null;
 
@@ -364,14 +320,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     }
 
     /**
-     * @return Collection|project[]
+     * @return Collection|Project[]
      */
     public function getProjects(): Collection
     {
         return $this->projects;
     }
 
-    public function addProject(project $project): self
+    public function addProject(Project $project): self
     {
         if (!$this->projects->contains($project)) {
             $this->projects[] = $project;
@@ -381,7 +337,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
         return $this;
     }
 
-    public function removeProject(project $project): self
+    public function removeProject(Project $project): self
     {
         if ($this->projects->removeElement($project)) {
             // set the owning side to null (unless already changed)

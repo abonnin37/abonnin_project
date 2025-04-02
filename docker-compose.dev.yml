@@ -11,6 +11,10 @@ services:
     environment:
       - APP_ENV=dev
       - DATABASE_URL=${DATABASE_URL}
+      - PHP_IDE_CONFIG=serverName=Docker
+      - XDEBUG_CONFIG=client_host=host.docker.internal
+    ports:
+      - "9003:9003"
     depends_on:
       - database
     networks:
@@ -32,6 +36,7 @@ services:
       - app-network
 
   database:
+    container_name: database
     image: mysql:8.0
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}

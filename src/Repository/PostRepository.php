@@ -48,7 +48,7 @@ class PostRepository extends ServiceEntityRepository
     public function findByCategory(string $category): array
     {
         return $this->createQueryBuilder('p')
-            ->join('p.category', 'c')
+            ->join('p.categories', 'c')
             ->andWhere('c.title = :category')
             ->setParameter('category', $category)
             ->orderBy('p.created_at', 'DESC')
