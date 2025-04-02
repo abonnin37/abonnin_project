@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class DeserializeListener
 {
-    private static array $formats;
+    private static array $formats = [];
 
     public function __construct(
         private readonly DecoratedListener $decorated,
@@ -79,7 +79,7 @@ class DeserializeListener
             $canonicalMimeType = trim(substr($mimeType, 0, $pos));
         }
 
-        if (null === static::$formats) {
+        if (empty(static::$formats)) {
             static::initializeFormats();
         }
 
