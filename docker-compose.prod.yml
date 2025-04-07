@@ -23,7 +23,7 @@ services:
     restart: always
     volumes:
       - volume_data:/var/www/html
-      - ./nginx/prod.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/prod.conf:/etc/nginx/conf.d/default.conf
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend-alexandrebonnin-fr.rule=Host(`backend.alexandrebonnin.fr`)"

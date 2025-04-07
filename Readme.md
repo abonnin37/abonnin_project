@@ -1,6 +1,6 @@
 # Installation
 ## Local
-Launch `docker compose --env-file .env.dev -f docker-compose.dev.yml up --build`
+Launch `docker compose --env-file .env -f docker-compose.dev.yml up --build`
 
 ## Prod
 Lancer le projet sur l'environnement de production :<br>

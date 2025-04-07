@@ -1,0 +1,8 @@
+composer.lock
+symfony.lock
+vendor
+var
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
