@@ -6,8 +6,7 @@ services:
       dockerfile: Dockerfile.prod
     restart: always
     environment:
-      - APP_ENV=prod
-      - SYMFONY_ENV=prod
+      - APP_ENV=${APP_ENV}
       - DATABASE_URL=${DATABASE_URL}
     volumes:
       - volume_data:/var/www/html

@@ -14,6 +14,7 @@ RUN apk add --no-cache \
     bash \
     libzip-dev \
     curl \
+    openssl \
     supervisor \
     nano \
     && docker-php-ext-configure zip \
@@ -26,7 +27,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # Installation des dépendances en mode production
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Génération des clés JWT
 RUN mkdir -p /var/www/html/config/jwt && \
