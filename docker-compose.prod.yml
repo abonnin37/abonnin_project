@@ -8,6 +8,11 @@ services:
     environment:
       - APP_ENV=${APP_ENV}
       - DATABASE_URL=${DATABASE_URL}
+      - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+      - JWT_PASSPHRASE=${JWT_PASSPHRASE}
+      - SERVER_EMAIL=${SERVER_EMAIL}
     volumes:
       - volume_data:/var/www/html
       - /var/projects/env_files/backend.alexandrebonnin.fr.env:/var/www/html/.env
