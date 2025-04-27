@@ -34,7 +34,7 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # Génération des clés JWT
 RUN mkdir -p /var/www/html/config/jwt && \
     openssl genrsa -out /var/www/html/config/jwt/private.pem -aes256 -passout pass:changeit 4096 && \
-    openssl rsa -in /var/www/html/config/jwt/private.pem -passin pass:changeit -pubout -out /var/www/html/config/jwt/public.pem \
+    openssl rsa -in /var/www/html/config/jwt/private.pem -passin pass:changeit -pubout -out /var/www/html/config/jwt/public.pem && \
     chown -R www-data:www-data /var/www/html/config/jwt
 
 # Création des répertoires var/cache et var/logs s'ils n'existent pas et Configuration des permissions
