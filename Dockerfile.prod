@@ -28,18 +28,19 @@ COPY . .
 
 COPY config/packages/prod/php.ini /usr/local/etc/php/conf.d/99-custom-prod.ini
 
-# Installation des dépendances en mode production
-RUN composer install --no-dev --optimize-autoloader --no-scripts
-# Nous choisissons les scripts que nous décidons d'installer pour accélérer le déploiement
-RUN php bin/console assets:install --symlink --relative
-RUN php bin/console cache:clear --env=prod
-
 # Génération des clés JWT
 RUN mkdir -p /var/www/html/config/jwt && \
     openssl genrsa -out /var/www/html/config/jwt/private.pem -aes256 -passout pass:changeit 4096 && \
     openssl rsa -in /var/www/html/config/jwt/private.pem -passin pass:changeit -pubout -out /var/www/html/config/jwt/public.pem && \
     chown -R www-data:www-data /var/www/html/config/jwt && \
     chmod 644 /var/www/html/config/jwt/private.pem
+
+# Installation des dépendances en mode production
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Nous choisissons les scripts que nous décidons d'installer pour accélérer le déploiement
+RUN php bin/console assets:install --symlink --relative
+RUN php bin/console cache:clear --env=prod
 
 # Création des répertoires var/cache et var/logs s'ils n'existent pas et Configuration des permissions
 RUN mkdir -p /var/www/html/var/cache /var/www/html/var/logs && \
