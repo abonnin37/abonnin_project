@@ -30,6 +30,9 @@ COPY config/packages/prod/php.ini /usr/local/etc/php/conf.d/99-custom-prod.ini
 
 # Installation des dépendances en mode production
 RUN composer install --no-dev --optimize-autoloader --no-scripts
+# Nous choisissons les scripts que nous décidons d'installer pour accélérer le déploiement
+RUN php bin/console assets:install --symlink --relative
+RUN php bin/console cache:clear --env=prod
 
 # Génération des clés JWT
 RUN mkdir -p /var/www/html/config/jwt && \
