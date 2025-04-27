@@ -25,6 +25,7 @@
         "symfony/framework-bundle": "5.2.*",
         "symfony/google-mailer": "5.2.*",
         "symfony/mailer": "5.2.*",
+        "symfony/maker-bundle": "*",
         "symfony/property-access": "5.2.*",
         "symfony/property-info": "5.2.*",
         "symfony/proxy-manager-bridge": "5.2.*",
@@ -85,7 +86,6 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
-        "symfony/maker-bundle": "^1.30",
         "symfony/stopwatch": "^5.2",
         "symfony/web-profiler-bundle": "^5.2"
     }
