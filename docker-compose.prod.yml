@@ -1,0 +1,48 @@
+services:
+  backend-alexandrebonnin-fr:
+    container_name: backend-alexandrebonnin-fr
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    restart: always
+    environment:
+      - APP_ENV=${APP_ENV}
+      - DATABASE_URL=${DATABASE_URL}
+      - CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
+      - JWT_PRIVATE_KEY_PATH=${JWT_PRIVATE_KEY_PATH}
+      - JWT_PUBLIC_KEY_PATH=${JWT_PUBLIC_KEY_PATH}
+      - JWT_PASSPHRASE=${JWT_PASSPHRASE}
+      - SERVER_EMAIL=${SERVER_EMAIL}
+    volumes:
+      - volume_data:/var/www/html
+      - /var/projects/env_files/backend.alexandrebonnin.fr.env:/var/www/html/.env
+      - /var/www/html/vendor
+      - /var/www/html/var
+    networks:
+      - traefik_default
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-backend-alexandrebonnin-fr
+    restart: always
+    volumes:
+      - volume_data:/var/www/html
+      - ./docker/nginx/prod.conf:/etc/nginx/conf.d/default.conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-alexandrebonnin-fr.rule=Host(`backend.alexandrebonnin.fr`)"
+      - "traefik.http.routers.backend-alexandrebonnin-fr.entrypoints=web,websecure"
+      - "traefik.http.services.backend-alexandrebonnin-fr.loadbalancer.server.port=80"
+      - "traefik.http.routers.backend-alexandrebonnin-fr.tls=true"
+      - "traefik.http.routers.backend-alexandrebonnin-fr.tls.certresolver=production"
+    depends_on:
+      - backend-alexandrebonnin-fr
+    networks:
+      - traefik_default
+
+networks:
+  traefik_default:
+    external: true
+
+volumes:
+  volume_data:

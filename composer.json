@@ -11,6 +11,7 @@
         "composer/package-versions-deprecated": "1.11.99.1",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.3",
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^3.1",
         "doctrine/orm": "^2.8",
         "gesdinet/jwt-refresh-token-bundle": "^0.12.0",
@@ -25,6 +26,7 @@
         "symfony/framework-bundle": "5.2.*",
         "symfony/google-mailer": "5.2.*",
         "symfony/mailer": "5.2.*",
+        "symfony/maker-bundle": "^1.39",
         "symfony/property-access": "5.2.*",
         "symfony/property-info": "5.2.*",
         "symfony/proxy-manager-bridge": "5.2.*",
@@ -32,6 +34,7 @@
         "symfony/serializer": "5.2.*",
         "symfony/twig-bundle": "5.2.*",
         "symfony/validator": "5.2.*",
+        "symfony/web-profiler-bundle": "^5.2",
         "symfony/yaml": "5.2.*",
         "symfonycasts/verify-email-bundle": "^1.5",
         "vich/uploader-bundle": "^1.18"
@@ -84,9 +87,6 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^3.4",
-        "symfony/maker-bundle": "^1.30",
-        "symfony/stopwatch": "^5.2",
-        "symfony/web-profiler-bundle": "^5.2"
+        "symfony/stopwatch": "^5.2"
     }
 }

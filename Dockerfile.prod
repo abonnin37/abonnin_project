@@ -1,0 +1,56 @@
+FROM php:8.2-fpm-alpine
+
+ARG JWT_PASSPHRASE
+ENV JWT_PASSPHRASE=${JWT_PASSPHRASE}
+
+# Définition du répertoire de travail
+WORKDIR /var/www/html
+
+# Install system dependencies
+RUN apk add --no-cache \
+    acl \
+    fcgi \
+    file \
+    git \
+    unzip \
+    zip \
+    bash \
+    libzip-dev \
+    curl \
+    openssl \
+    supervisor \
+    nano \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install pdo pdo_mysql zip opcache
+
+# Installation de Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Copie des fichiers du projet
+COPY . .
+
+COPY config/packages/prod/php.ini /usr/local/etc/php/conf.d/99-custom-prod.ini
+
+# Installation des dépendances en mode production
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Nous choisissons les scripts que nous décidons d'installer pour accélérer le déploiement
+RUN php bin/console assets:install --symlink --relative
+RUN php bin/console cache:clear --env=prod
+
+# Création des répertoires var/cache et var/logs s'ils n'existent pas et Configuration des permissions
+RUN mkdir -p /var/www/html/var/cache /var/www/html/var/logs && \
+    chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html/var
+
+# Expose port
+EXPOSE 9000
+
+# Healthcheck pour tester si le port 9000 est ouvert et répond
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD nc -z localhost 9000 || exit 1
+
+# Call bash file to run some commands after container execution
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

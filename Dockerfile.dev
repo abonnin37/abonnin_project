@@ -1,0 +1,63 @@
+FROM php:8.2-fpm-alpine
+
+# Définition du répertoire de travail
+WORKDIR /var/www/html
+
+# Install system dependencies
+RUN apk add --no-cache \
+    acl \
+    fcgi \
+    file \
+    git \
+    unzip \
+    zip \
+    bash \
+    libzip-dev \
+    curl \
+    supervisor \
+    nano \
+    autoconf \
+    gcc \
+    g++ \
+    make \
+    libc-dev \
+    libtool \
+    pkgconf \
+    re2c \
+     linux-headers \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install pdo pdo_mysql zip
+
+# Installation de Xdebug
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && mkdir -p /var/log \
+    && touch /var/log/xdebug.log \
+    && chown www-data:www-data /var/log/xdebug.log
+
+COPY /docker/php/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+
+# Installation de Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Copie des fichiers du projet
+COPY . .
+
+# Installation des dépendances pour du developpement
+RUN composer install
+
+# Génération des clés JWT
+RUN mkdir -p /var/www/html/config/jwt && \
+    openssl genrsa -out /var/www/html/config/jwt/private.pem -aes256 -passout pass:changeit 4096 && \
+    openssl rsa -in /var/www/html/config/jwt/private.pem -passin pass:changeit -pubout -out /var/www/html/config/jwt/public.pem
+
+# Configuration des permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/var
+
+
+# Expose port
+EXPOSE 9000
+
+# Start PHP-FPM
+CMD ["php-fpm"]
